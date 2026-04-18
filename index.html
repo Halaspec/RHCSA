@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RHCSA EX200 — RHEL 10 · Hands-On Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f2efe8;--bg-elev:#f8f6f0;--surface:#e8e5dd;--surface-2:#ddd9cf;
+  --border:#d4d1c8;--border-strong:#b8b4a8;
+  --text:#383531;--text-muted:#6a6861;--text-faint:#918d84;
+  --accent:#c4361c;--accent-soft:#fbe9e3;--accent-hover:#a82e15;
+  --success:#15803d;--success-bg:#dcfce7;
+  --error:#b91c1c;--error-bg:#fee2e2;
+  --warn:#a16207;--warn-bg:#fef3c7;
+  --code-bg:#ebe7dd;--code-text:#2b2922;
+  --term-bg:#1a1a1a;--term-text:#e8e8e8;--term-prompt:#7fd17f;
+  --tag-bg:#e1e5d3;--tag-text:#4a5934;
+  --new-bg:#efe0b2;--new-text:#7a5214;
+  --shadow-sm:0 1px 2px rgba(15,15,15,.04);
+  --shadow-md:0 4px 16px rgba(15,15,15,.06);
+}
+[data-theme="dark"]{
+  --bg:#191919;--bg-elev:#202020;--surface:#252525;--surface-2:#2c2c2c;
+  --border:#2f2f2f;--border-strong:#404040;
+  --text:#e8e6e3;--text-muted:#9a9a96;--text-faint:#6f6f6f;
+  --accent:#e87b5e;--accent-soft:#3a2218;--accent-hover:#f08b6e;
+  --success:#4ade80;--success-bg:#1a3328;
+  --error:#f87171;--error-bg:#3a1a1a;
+  --warn:#eab308;--warn-bg:#3a2f15;
+  --code-bg:#202020;--code-text:#d4d4d2;
+  --term-bg:#0f0f0f;
+  --tag-bg:#2a3320;--tag-text:#a3c270;
+  --new-bg:#3a2f15;--new-text:#e0c478;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',ui-sans-serif,system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.6;-webkit-font-smoothing:antialiased;transition:background .25s,color .25s}
+.app{display:grid;grid-template-columns:300px 1fr;min-height:100vh;transition:grid-template-columns .3s cubic-bezier(0.165,0.85,0.45,1)}
+.sidebar{position:sticky;top:0;height:100vh;background:var(--bg-elev);border-right:1px solid var(--border);overflow-y:auto;overflow-x:hidden;padding:18px 10px 80px;font-size:14px;transition:transform .3s cubic-bezier(0.165,0.85,0.45,1),opacity .2s}
+@media (min-width:961px){
+  .app.sidebar-collapsed{grid-template-columns:0 1fr}
+  .app.sidebar-collapsed .sidebar{transform:translateX(-100%);opacity:0;pointer-events:none}
+}
+.pin-btn{display:grid}
+.pin-btn svg{width:17px;height:17px;transition:transform .25s ease}
+.pin-btn[aria-pressed="false"] svg{transform:scaleX(-1);color:var(--accent)}
+.pin-btn:hover{background:var(--surface)}
+@media (max-width:960px){.pin-btn{display:none !important}}
+.nav-cat-progress{position:absolute;left:0;right:0;bottom:0;height:2px;background:transparent;border-radius:1px;overflow:hidden;pointer-events:none}
+.nav-cat-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--success));transition:width .3s ease;border-radius:1px;opacity:.7}
+.nav-cat{position:relative}
+.nav-cat .count.done{background:var(--success-bg);color:var(--success)}
+.sidebar::-webkit-scrollbar{width:6px}
+.sidebar::-webkit-scrollbar-thumb{background:var(--border-strong);border-radius:3px}
+.brand{display:flex;align-items:center;gap:10px;padding:6px 10px 14px}
+.brand-icon{width:30px;height:30px;border-radius:7px;background:linear-gradient(135deg,#c4361c,#8a1f0a);color:#fff;font-weight:700;font-size:13px;display:grid;place-items:center;font-family:'Source Serif 4',Georgia,serif;box-shadow:var(--shadow-sm)}
+.brand-text{font-weight:600;font-size:15px;letter-spacing:-.01em;line-height:1.1}
+.brand-sub{font-size:11px;color:var(--text-faint);font-weight:500;margin-top:2px}
+.search{position:relative;margin:8px 6px 18px}
+.search input{width:100%;padding:7px 10px 7px 30px;background:var(--surface);border:1px solid transparent;border-radius:6px;color:var(--text);font-family:inherit;font-size:13px;outline:none;transition:all .15s}
+.search input:focus{background:var(--bg);border-color:var(--border-strong);box-shadow:0 0 0 3px rgba(196,54,28,.08)}
+.search svg{position:absolute;left:9px;top:50%;transform:translateY(-50%);width:14px;height:14px;color:var(--text-faint);pointer-events:none}
+.nav-section{margin-bottom:4px}
+.nav-cat{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;color:var(--text-muted);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;cursor:pointer;user-select:none;border-radius:4px}
+.nav-cat:hover{background:var(--surface)}
+.nav-cat-num{display:inline-block;width:18px;height:18px;background:var(--surface-2);color:var(--text-muted);border-radius:4px;font-size:10px;font-weight:700;text-align:center;line-height:18px;margin-right:8px;letter-spacing:0}
+.nav-cat .count{background:var(--surface-2);color:var(--text-muted);padding:1px 6px;border-radius:10px;font-size:10px;font-weight:600;letter-spacing:0;text-transform:none}
+.nav-items{margin:2px 0 6px}
+.nav-items.collapsed{display:none}
+.nav-link{display:flex;align-items:center;gap:8px;padding:6px 8px 6px 14px;color:var(--text-muted);font-size:13px;text-decoration:none;border-radius:4px;transition:background .12s;position:relative;line-height:1.35}
+.nav-link:hover{background:var(--surface);color:var(--text)}
+.nav-link.active{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.nav-link .num{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text-faint);min-width:26px;flex-shrink:0}
+.nav-link.active .num{color:var(--accent)}
+.nav-link .lbl{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:18px}
+.nav-link .check{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:14px;height:14px;border-radius:3px;border:1.5px solid var(--border-strong);display:grid;place-items:center}
+.nav-link[data-done="true"] .check{background:var(--success);border-color:var(--success)}
+.nav-link[data-done="true"] .check::after{content:"";width:6px;height:3px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(0,-1px)}
+.main{min-width:0}
+.topbar{position:sticky;top:0;z-index:10;background:rgba(242,239,232,.88);backdrop-filter:saturate(180%) blur(12px);border-bottom:1px solid var(--border);padding:10px 32px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+[data-theme="dark"] .topbar{background:rgba(25,25,25,.85)}
+.crumbs{font-size:13px;color:var(--text-muted);display:flex;align-items:center;gap:10px;min-width:0;overflow:hidden}
+.crumbs strong{color:var(--text);font-weight:500}
+.topbar-actions{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.icon-btn{background:transparent;border:none;width:32px;height:32px;border-radius:5px;display:grid;place-items:center;cursor:pointer;color:var(--text-muted);transition:background .12s}
+.icon-btn:hover{background:var(--surface)}
+.icon-btn svg{width:16px;height:16px}
+.progress-pill{font-size:12px;color:var(--text-muted);padding:5px 10px;border-radius:12px;background:var(--surface);font-family:'JetBrains Mono',monospace;font-weight:500}
+.progress-pill b{color:var(--accent);font-weight:600}
+.content{max-width:920px;margin:0 auto;padding:48px 64px 120px;transition:max-width .3s ease}
+.app.sidebar-collapsed .content{max-width:960px}
+.hero{margin-bottom:48px;padding-bottom:32px;border-bottom:1px solid var(--border)}
+.hero-label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--accent);text-transform:uppercase;margin-bottom:14px}
+.hero h1{font-family:'Source Serif 4',Georgia,serif;font-size:44px;font-weight:700;letter-spacing:-.025em;line-height:1.1;margin-bottom:14px}
+.hero p{font-size:16px;color:var(--text-muted);max-width:660px;line-height:1.65}
+.hero-meta{display:flex;flex-wrap:wrap;gap:24px;margin-top:28px;font-size:13px;color:var(--text-faint)}
+.hero-author{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:20px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--text-muted)}
+.hero-author .ha-lbl{color:var(--text-faint);font-size:12px;letter-spacing:.02em}
+.hero-author .ha-name{color:var(--text);font-weight:600;font-family:'Source Serif 4',Georgia,serif;letter-spacing:-.01em}
+.hero-author .ha-link{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:var(--bg-elev);border:1px solid var(--border);border-radius:14px;color:var(--text-muted);text-decoration:none;font-size:12px;font-weight:500;transition:all .12s}
+.hero-author .ha-link:hover{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+.hero-author .ha-link svg{width:13px;height:13px}
+.hero-meta b{color:var(--text-muted);font-weight:600}
+.hero-note{margin-top:20px;padding:12px 16px;background:var(--surface);border-radius:6px;font-size:13px;color:var(--text-muted);border-left:3px solid var(--accent)}
+.cat-header{margin:72px 0 22px;padding-bottom:12px;border-bottom:1px solid var(--border);display:flex;align-items:baseline;gap:12px}
+.cat-header:first-of-type{margin-top:0}
+.cat-num{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;color:var(--accent);background:var(--accent-soft);padding:4px 8px;border-radius:5px;letter-spacing:.02em}
+.cat-header h2{font-family:'Source Serif 4',Georgia,serif;font-size:30px;font-weight:600;letter-spacing:-.02em;flex:1}
+.cat-header .cat-count{font-size:12px;color:var(--text-faint);font-family:'JetBrains Mono',monospace;letter-spacing:.02em}
+.question{background:var(--bg-elev);border:1px solid var(--border);border-radius:10px;margin-bottom:18px;overflow:hidden;transition:border-color .15s}
+.question:hover{border-color:var(--border-strong)}
+.question.done{border-left:3px solid var(--success)}
+.q-header{padding:18px 22px;display:flex;align-items:flex-start;gap:14px}
+.q-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;color:var(--text-faint);background:var(--surface);padding:4px 8px;border-radius:4px;flex-shrink:0;margin-top:2px;letter-spacing:.02em}
+.q-title-wrap{flex:1;min-width:0}
+.q-scenario-title{font-size:15.5px;font-weight:500;color:var(--text);line-height:1.5;letter-spacing:-.005em}
+.q-scenario-title code{font-family:'JetBrains Mono',monospace;background:var(--code-bg);padding:1px 6px;border-radius:3px;font-size:.88em;color:var(--accent)}
+.q-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}
+.tag{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:3px;background:var(--tag-bg);color:var(--tag-text);letter-spacing:.02em;text-transform:lowercase;font-family:'JetBrains Mono',monospace}
+.tag.new{background:var(--new-bg);color:var(--new-text);text-transform:uppercase;letter-spacing:.06em}
+.tag.critical{background:var(--accent-soft);color:var(--accent);text-transform:uppercase;letter-spacing:.06em}
+.q-check{width:22px;height:22px;border:1.5px solid var(--border-strong);border-radius:5px;display:grid;place-items:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .12s}
+.q-check:hover{border-color:var(--accent)}
+.q-check.checked{background:var(--success);border-color:var(--success)}
+.q-check.checked::after{content:"";width:9px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(0,-1px)}
+.q-body{padding:20px 22px 22px;border-top:1px solid var(--border)}
+.terminal-wrap{margin-bottom:14px}
+.terminal-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin-bottom:8px;display:flex;align-items:center;justify-content:space-between}
+.terminal{background:var(--term-bg);border-radius:8px;overflow:hidden;border:1px solid var(--border-strong);box-shadow:var(--shadow-sm)}
+.term-bar{background:#2a2a2a;padding:8px 12px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #3a3a3a}
+.term-dot{width:11px;height:11px;border-radius:50%}
+.term-dot.r{background:#ff5f56}.term-dot.y{background:#ffbd2e}.term-dot.g{background:#27c93f}
+.term-title{margin:0 auto;font-family:'JetBrains Mono',monospace;font-size:11px;color:#888}
+.term-body{padding:14px 16px;display:flex;align-items:flex-start;gap:8px;font-family:'JetBrains Mono',monospace;font-size:13.5px;color:var(--term-text);line-height:1.55}
+.term-prompt{color:var(--term-prompt);white-space:nowrap;user-select:none;flex-shrink:0;padding-top:2px}
+.term-prompt .host{color:#6ab0f3}.term-prompt .sep{color:#888}
+.term-input{flex:1;background:transparent;border:none;outline:none;resize:vertical;color:var(--term-text);font-family:inherit;font-size:inherit;line-height:1.55;min-height:24px;padding:2px 0;caret-color:var(--term-text);word-break:break-all}
+.term-input::placeholder{color:#555;font-style:italic}
+.file-editor-wrap{margin-top:14px}
+.file-editor .term-title{font-style:normal;display:inline-flex;align-items:center;gap:4px;color:#d0d0d0}
+.file-editor .term-title .file-path{color:#9ed0ff;font-weight:500;font-family:'JetBrains Mono',monospace}
+.file-editor .term-title svg.file-icon{width:12px;height:12px;color:#9ed0ff;flex-shrink:0}
+.file-body{padding:12px 16px;display:block}
+.file-input{width:100%;background:transparent;border:none;outline:none;resize:vertical;color:var(--term-text);font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;min-height:80px;padding:2px 0;white-space:pre;word-break:normal}
+.file-input::placeholder{color:#555;font-style:italic}
+.dual-label .pill{background:var(--surface);color:var(--text-muted);padding:2px 7px;border-radius:10px;font-size:10px;letter-spacing:.04em;text-transform:none;font-weight:500}
+/* Token chips shown in feedback */
+.tokens-wrap{margin-top:10px}
+.tokens-heading{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:inherit;opacity:.75;margin-bottom:6px}
+.tokens-heading.found{margin-top:10px}
+.token-list{display:flex;flex-wrap:wrap;gap:5px}
+.token-chip{font-family:'JetBrains Mono',monospace;font-size:11.5px;padding:3px 9px;border-radius:4px;border:1px solid;letter-spacing:.01em;line-height:1.4}
+.token-chip.missing{background:var(--error-bg);color:var(--error);border-color:var(--error);border-style:dashed}
+.token-chip.found{background:var(--success-bg);color:var(--success);border-color:var(--success);opacity:.85}
+[data-theme="dark"] .token-chip.missing{background:#3a1a1a}
+[data-theme="dark"] .token-chip.found{background:#1a3328}
+.tokens-side{font-size:11px;font-weight:600;color:var(--text-muted);margin-top:10px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.tokens-side::before{content:"";width:4px;height:4px;border-radius:50%;background:currentColor}
+
+/* Line numbers gutter */
+.file-body{padding:0;display:flex;align-items:stretch;min-height:100px}
+.file-linenumbers{padding:12px 8px 12px 14px;color:#555;font-family:'JetBrains Mono',monospace;font-size:13px;line-height:1.6;text-align:right;user-select:none;white-space:pre;flex-shrink:0;border-right:1px solid #2f2f2f;min-width:42px;background:rgba(255,255,255,.02)}
+.file-input{padding:12px 16px 12px 14px !important;flex:1;min-height:100px}
+.file-editor .term-body.file-body .file-input::placeholder{color:#4a4a4a}
+
+/* Attempt counter chip in feedback */
+.attempt-chip{display:inline-block;margin-left:8px;font-size:11px;background:var(--surface);color:var(--text-muted);padding:2px 8px;border-radius:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.02em;border:1px solid var(--border)}
+
+/* Small hint shown under shell terminal */
+.input-hint{font-size:11px;color:var(--text-faint);margin-top:5px;font-style:italic;line-height:1.4}
+.input-hint kbd{font-family:'JetBrains Mono',monospace;background:var(--surface);border:1px solid var(--border);border-radius:3px;padding:0 4px;font-size:10.5px;font-style:normal}
+.q-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn{font-family:'Inter',sans-serif;font-size:13px;font-weight:600;padding:8px 16px;border-radius:6px;border:1px solid transparent;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:6px}
+.btn svg{width:14px;height:14px}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent-hover)}
+.btn-ghost{background:transparent;color:var(--text-muted);border-color:var(--border-strong)}
+.btn-ghost:hover{background:var(--surface);color:var(--text)}
+.btn-link{background:transparent;color:var(--text-muted);border:none;padding:8px 4px;text-decoration:underline;text-decoration-color:transparent;transition:text-decoration-color .15s,color .12s}
+.btn-link:hover{color:var(--text);text-decoration-color:currentColor}
+.q-feedback{margin-top:14px;padding:12px 16px;border-radius:6px;font-size:13.5px;display:none;align-items:flex-start;gap:10px;line-height:1.55}
+.q-feedback.show{display:flex}
+.q-feedback.success{background:var(--success-bg);color:var(--success)}
+.q-feedback.error{background:var(--error-bg);color:var(--error)}
+.q-feedback-icon{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;flex-shrink:0;margin-top:1px;font-weight:700;font-size:12px}
+.q-feedback.success .q-feedback-icon{background:var(--success);color:#fff}
+.q-feedback.error .q-feedback-icon{background:var(--error);color:#fff}
+.q-solution{display:none;margin-top:18px}
+.q-solution.show{display:block;animation:reveal .3s ease}
+@keyframes reveal{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.solution-label{display:flex;align-items:center;gap:10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);font-weight:700;margin-bottom:14px;padding-top:14px;border-top:1px dashed var(--border)}
+.solution-label::before,.solution-label::after{content:"";flex:1;height:1px;background:var(--border)}
+.steps{display:flex;flex-direction:column;gap:18px}
+.step-title{font-weight:600;font-size:14px;margin-bottom:6px;display:flex;align-items:flex-start;gap:10px;color:var(--text);line-height:1.45}
+.step-num{width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:11px;font-weight:700;display:grid;place-items:center;flex-shrink:0;font-family:'JetBrains Mono',monospace;margin-top:-1px}
+.step-desc{margin-left:32px;color:var(--text-muted);font-size:13.5px;line-height:1.65}
+.step-desc p{margin-bottom:6px}
+.step-desc strong{color:var(--text);font-weight:600}
+pre{background:var(--code-bg);border:1px solid var(--border);border-radius:6px;padding:12px 14px;overflow-x:auto;margin:10px 0 4px 32px;position:relative}
+pre code{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--code-text);line-height:1.65;background:none}
+.copy-btn{position:absolute;top:6px;right:6px;background:var(--bg);border:1px solid var(--border);border-radius:4px;padding:3px 8px;font-size:11px;color:var(--text-muted);cursor:pointer;font-family:inherit;opacity:0;transition:opacity .15s}
+pre:hover .copy-btn{opacity:1}
+.copy-btn:hover{background:var(--surface);color:var(--text)}
+.copy-btn.copied{color:var(--success);border-color:var(--success)}
+code:not(pre code){font-family:'JetBrains Mono',monospace;background:var(--code-bg);padding:1px 5px;border-radius:3px;font-size:.88em;color:var(--accent)}
+.callout{margin:12px 0 6px 32px;padding:10px 14px;background:var(--surface);border-left:3px solid var(--accent);border-radius:0 5px 5px 0;font-size:13px;color:var(--text);line-height:1.55}
+.callout.warn{background:var(--warn-bg);border-left-color:var(--warn)}
+.callout-title{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:4px}
+.callout.warn .callout-title{color:var(--warn)}
+.persist{margin-top:14px;padding:8px 14px;border:1px dashed var(--border-strong);border-radius:5px;font-size:12px;color:var(--text-muted);font-style:italic}
+.persist b{color:var(--text);font-style:normal}
+.question.hidden,.cat-header.hidden{display:none}
+.footer{margin-top:80px;padding-top:32px;border-top:1px solid var(--border);font-size:13px;color:var(--text-faint);text-align:center;line-height:1.7}
+.menu-btn{display:none}
+@media (max-width:960px){
+  .app{grid-template-columns:1fr}
+  .sidebar{position:fixed;left:0;top:0;width:300px;transform:translateX(-100%);transition:transform .25s;z-index:100;box-shadow:var(--shadow-md)}
+  .sidebar.open{transform:translateX(0)}
+  .content{padding:32px 24px 100px}
+  .hero h1{font-size:32px}
+  .topbar{padding:10px 16px}
+  .menu-btn{display:grid !important}
+  .scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;display:none}
+  .scrim.active{display:block}
+}
+@media (max-width:540px){
+  .content{padding:24px 14px 80px}
+  .hero h1{font-size:26px}
+  .q-header{padding:14px}
+  .q-body{padding:14px 14px 18px}
+  pre{margin-left:0;font-size:11.5px}
+  .step-desc,.callout{margin-left:0}
+  .term-body{font-size:12.5px;padding:12px}
+  .term-prompt{display:none}
+}
+</style>
+</head>
+<body>
+<div class="scrim" id="scrim"></div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="brand-icon">RH</div>
+      <div><div class="brand-text">RHCSA EX200</div><div class="brand-sub">RHEL 10 — Hands-on practice</div></div>
+    </div>
+    <div class="search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></svg>
+      <input type="text" id="searchInput" placeholder="Search a command, topic, tag...">
+    </div>
+    <nav id="nav"></nav>
+  </aside>
+  <main class="main">
+    <div class="topbar">
+      <div class="crumbs">
+        <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <button class="icon-btn pin-btn" id="pinBtn" type="button" aria-label="Toggle sidebar" aria-pressed="true" title="Toggle sidebar (press [)">
+          <svg viewBox="0 0 20 20" fill="currentColor" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16.5 4A1.5 1.5 0 0 1 18 5.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 2 14.5v-9A1.5 1.5 0 0 1 3.5 4zM7 15h9.5a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5H7zM3.5 5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5H6V5z"/></svg>
+        </button>
+        Preparation / <strong>RHCSA EX200 (RHEL 10)</strong>
+      </div>
+      <div class="topbar-actions">
+        <div class="progress-pill"><b id="progDone">0</b> / <span id="progTotal">0</span> tasks</div>
+        <button class="icon-btn" id="resetBtn" title="Reset progress">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9c-2.5 0-4.7 1-6.4 2.6L3 8"/><path d="M3 3v5h5"/></svg>
+        </button>
+        <button class="icon-btn" id="themeBtn" title="Toggle theme">
+          <svg id="iconLight" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+          <svg id="iconDark" style="display:none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="content">
+      <header class="hero">
+        <div class="hero-label">Exam preparation · EX200 v10</div>
+        <h1>Every RHCSA hands-on task, with a real terminal to practice in</h1>
+        <p>Each task is a realistic exam-style scenario. Type your answer in the terminal box, then validate. Solutions stay hidden unless you ask for them or until your answer is wrong, so you get to try first and review second.</p>
+        <div class="hero-meta">
+          <span><b>80 hands-on tasks</b></span>
+          <span>Exam duration: <b>3 hours</b></span>
+          <span>Passing score: <b>210 / 300</b></span>
+          <span>Covers <b>Flatpak and systemd timers</b> (RHEL 10)</span>
+        </div>
+        <div class="hero-author">
+          <span class="ha-lbl">Made by</span>
+          <span class="ha-name">Hamza SALAH</span>
+          <a href="https://www.linkedin.com/in/salah-h/" target="_blank" rel="noopener" class="ha-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05a3.74 3.74 0 0 1 3.37-1.85c3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.07 2.07 0 1 1 0-4.14 2.07 2.07 0 0 1 0 4.14zm1.78 13.02H3.56V9h3.56v11.45zM22.22 0H1.77C.8 0 0 .77 0 1.72v20.56C0 23.23.8 24 1.77 24h20.45C23.2 24 24 23.23 24 22.28V1.72C24 .77 23.2 0 22.22 0z"/></svg>
+            <span>LinkedIn</span>
+          </a>
+          <a href="https://github.com/Halaspec" target="_blank" rel="noopener" class="ha-link">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .3a12 12 0 0 0-3.79 23.39c.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.1-.75.08-.73.08-.73 1.21.08 1.85 1.24 1.85 1.24 1.07 1.85 2.82 1.31 3.51 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.34-5.47-5.95 0-1.32.47-2.4 1.24-3.25-.14-.3-.54-1.53.12-3.19 0 0 1.01-.32 3.3 1.24a11.52 11.52 0 0 1 6.01 0c2.29-1.56 3.3-1.24 3.3-1.24.66 1.66.24 2.89.12 3.19.77.85 1.24 1.93 1.24 3.25 0 4.62-2.8 5.65-5.48 5.95.43.37.82 1.1.82 2.22v3.29c0 .32.22.7.83.58A12 12 0 0 0 12 .3"/></svg>
+            <span>GitHub</span>
+          </a>
+        </div>
+        <div class="hero-note">
+          <b>How to use:</b> Read the scenario, type the command(s) in the terminal, press <b>Enter</b> or click <b>Validate</b>. Some tasks require editing a file — when that happens a <b>second panel</b> appears where you type what goes inside the file; shell and file contents are validated independently. <b>Tasks are reshuffled on every refresh</b>; task #12 is always the same task regardless of position. Press <kbd>?</kbd> to see the keyboard shortcuts.
+        </div>
+      </header>
+      <div id="questions"></div>
+      <footer class="footer">
+        <p>All configurations must <b>persist across reboots</b>. When a task modifies a configuration file or the bootloader, reboot once and verify before moving on.</p>
+        <p style="margin-top:8px">Based on the official Red Hat EX200 v10 objectives.</p>
+      </footer>
+    </div>
+  </main>
+</div>
+<script>
+const DATA = [
+{cat:"Essential Tools",questions:[
+{sc:"Connect from your local machine to the remote host <code>servera.lab.example.com</code> as user <code>student</code>, then exit the session.",tags:["ssh"],check:[["ssh","student","servera","exit"]],steps:[
+{t:"Open an SSH session",d:"<code>ssh</code> is the OpenSSH client. The basic syntax is <code>ssh user@host</code>. If the remote host has your public key in its <code>authorized_keys</code>, no password is asked. The first time you connect, SSH asks you to accept the server's host key fingerprint.",code:"ssh student@servera.lab.example.com"},
+{t:"Exit the remote shell",d:"Typing <code>exit</code> or pressing <kbd>Ctrl-D</kbd> closes the session cleanly and returns you to the local shell.",code:"exit"},
+{t:"Run a single command remotely without an interactive session",d:"Everything after the host is executed remotely, then SSH returns.",code:"ssh student@servera.lab.example.com 'hostname; uptime'"}]},
+{sc:"Save the listing of <code>/etc</code> to <code>/tmp/etc.txt</code>, then append the listing of <code>/var</code> to the same file. Finally run a <code>find</code> that discards all <i>Permission denied</i> error messages.",tags:["redirection"],check:[["ls /etc","> /tmp/etc.txt","ls /var",">> /tmp/etc.txt","find","2>","/dev/null"]],steps:[
+{t:"Overwrite a file with stdout",d:"The operator <code>&gt;</code> redirects standard output (fd 1) to a file, <b>replacing</b> its content. If the file does not exist, it is created.",code:"ls /etc > /tmp/etc.txt"},
+{t:"Append to a file with stdout",d:"The operator <code>&gt;&gt;</code> also redirects stdout, but <b>appends</b> to the end of the file instead of truncating it.",code:"ls /var >> /tmp/etc.txt"},
+{t:"Redirect error messages (stderr)",d:"Every process has three standard file descriptors: <code>0</code> stdin, <code>1</code> stdout, <code>2</code> stderr. The syntax <code>2&gt;</code> redirects stderr. Sending it to <code>/dev/null</code> discards it silently.",code:"find / -name passwd 2> /dev/null"},
+{t:"Redirect both stdout and stderr at once",d:"<code>&amp;&gt;</code> redirects both to the same destination. Equivalent to <code>&gt; file 2&gt;&amp;1</code>.",code:"find / -name passwd &> /tmp/find.log"},
+{t:"Pipe the output of one command to another",d:"<code>|</code> sends the stdout of the left command as stdin of the right one. It is the backbone of shell composition.",code:"ps aux | grep sshd"}]},
+{sc:"Print every line of <code>/etc/passwd</code> whose login shell is <code>/bin/bash</code>, then count the matches.",tags:["grep","regex"],check:[["grep","/bin/bash","/etc/passwd","-c"],["grep","/bin/bash","/etc/passwd","wc -l"]],steps:[
+{t:"Match a literal pattern",d:"<code>grep PATTERN FILE</code> prints the lines that contain the pattern. The pattern is treated as a Basic Regular Expression (BRE) by default.",code:"grep '/bin/bash' /etc/passwd"},
+{t:"Case-insensitive search with -i",d:"The flag <code>-i</code> ignores case. <code>grep -i root /etc/passwd</code> matches <code>root</code>, <code>ROOT</code> or <code>Root</code>.",code:"grep -i 'root' /etc/passwd"},
+{t:"Count matching lines with -c",d:"<code>-c</code> prints only the count, not the lines themselves.",code:"grep -c '/bin/bash' /etc/passwd"},
+{t:"Invert the match with -v",d:"<code>-v</code> prints every line that does <b>not</b> match — useful to skip comments or blank lines.",code:"grep -v '^#' /etc/ssh/sshd_config | grep -v '^$'"},
+{t:"Use an extended regex with -E",d:"Extended regex (ERE) allows <code>|</code>, <code>+</code>, <code>?</code>, <code>()</code> without backslashes.",code:"grep -E '^(root|admin|wheel):' /etc/passwd"},
+{t:"Search recursively through a directory",d:"<code>-r</code> recursively searches a directory tree. Often combined with <code>-n</code> (show line numbers) and <code>-l</code> (show only filenames with matches).",code:"grep -rn 'TODO' /var/www/"}]},
+{sc:"Create <code>/tmp/source.txt</code>, then make a hard link named <code>/tmp/hardlink</code> and a symbolic link named <code>/tmp/symlink</code> that both point to it.",tags:["links"],check:[["ln /tmp/source.txt /tmp/hardlink","ln -s /tmp/source.txt /tmp/symlink"]],steps:[
+{t:"Create the source file",d:"Simple redirection creates the file.",code:"echo 'content' > /tmp/source.txt"},
+{t:"Create a hard link",d:"A hard link is a second directory entry pointing to the <b>same inode</b>. Both names are equal — deleting one leaves the other intact. Hard links cannot cross filesystems or point to directories. Syntax: <code>ln TARGET LINKNAME</code>.",code:"ln /tmp/source.txt /tmp/hardlink"},
+{t:"Create a symbolic (soft) link",d:"A symlink is a small file whose content is the path to another file. It has its own inode. If the target is removed, the link becomes dangling. The <code>-s</code> flag asks for a symbolic link.",code:"ln -s /tmp/source.txt /tmp/symlink"},
+{t:"Verify by comparing inodes",d:"<code>-i</code> shows the inode number. Hard-linked files share the same inode; the symlink has a different one.",code:"ls -li /tmp/source.txt /tmp/hardlink /tmp/symlink"}]},
+{sc:"Create a gzip-compressed tar archive of <code>/etc</code> at <code>/root/etc-backup.tar.gz</code>, then extract it under <code>/tmp</code>.",tags:["tar","gzip"],check:[["tar","c","z","/root/etc-backup.tar.gz","/etc","tar","x","/tmp"]],steps:[
+{t:"Create a compressed tar archive",d:"Flags you need to memorize: <code>c</code>=create, <code>x</code>=extract, <code>t</code>=list, <code>v</code>=verbose, <code>f</code>=follow by filename, <code>z</code>=gzip, <code>j</code>=bzip2, <code>J</code>=xz. The <code>-f</code> flag must come just before the archive name.",code:"tar -czvf /root/etc-backup.tar.gz /etc"},
+{t:"List the archive contents without extracting",d:"Use <code>t</code> (list) together with the same compression flag used to create the archive.",code:"tar -tzvf /root/etc-backup.tar.gz"},
+{t:"Extract into a specific directory",d:"<code>-C DIR</code> changes to <code>DIR</code> before extraction. Without it, extraction happens in the current working directory.",code:"tar -xzvf /root/etc-backup.tar.gz -C /tmp"},
+{t:"Use bzip2 for a smaller (slower) archive",d:"<code>j</code> activates bzip2 compression. Better ratio than gzip, slower.",code:"tar -cjvf /root/etc-backup.tar.bz2 /etc"}]},
+{sc:"Use vim to create <code>/tmp/note.txt</code> with the word <code>hello</code> on the first line, then save and quit.",tags:["vim"],check:[["vim /tmp/note.txt","hello",":wq"],["vi /tmp/note.txt","hello",":wq"]],steps:[
+{t:"Open (or create) the file",d:"<code>vim</code> opens existing files or creates a new one. Vim starts in <b>normal</b> mode where keys are commands, not text.",code:"vim /tmp/note.txt"},
+{t:"Switch to insert mode",d:"Press <kbd>i</kbd> (insert before cursor) or <kbd>a</kbd> (append after cursor) or <kbd>o</kbd> (open new line below) to start typing text. The footer shows <code>-- INSERT --</code>.",code:"# inside vim: press  i  then type:\nhello"},
+{t:"Save and quit",d:"Press <kbd>Esc</kbd> to leave insert mode, then type <code>:wq</code> and <kbd>Enter</kbd>. <code>:w</code> writes, <code>:q</code> quits, <code>:wq</code> combines both. <code>:q!</code> quits without saving, <code>ZZ</code> saves and quits.",code:":wq"},
+{t:"Essential motion and editing commands",d:"<code>/pattern</code> searches forward, <code>n</code> next match, <code>N</code> previous. <code>:N</code> jumps to line N. <code>G</code> goes to last line, <code>gg</code> to first. <code>u</code> undoes, <kbd>Ctrl-r</kbd> redoes. <code>dd</code> deletes a line, <code>yy</code> copies, <code>p</code> pastes."}]},
+{sc:"Set permissions to <code>rwxr-x---</code> on <code>/tmp/script.sh</code>, then make it executable for everyone.",tags:["chmod"],check:[["chmod 750","/tmp/script.sh","chmod","+x"],["chmod u=rwx,g=rx","/tmp/script.sh","chmod","+x"]],steps:[
+{t:"Octal (numeric) notation",d:"Each permission has a weight: <b>r=4, w=2, x=1</b>. Add them up per user-class: owner (u), group (g), other (o). So <code>rwxr-x---</code> = 7/5/0 = <code>750</code>. This is the concise notation used on real exams.",code:"chmod 750 /tmp/script.sh"},
+{t:"Symbolic notation",d:"<code>u=user, g=group, o=other, a=all</code>. <code>+</code> adds, <code>-</code> removes, <code>=</code> sets exactly. Multiple changes are comma-separated.",code:"chmod u=rwx,g=rx,o= /tmp/script.sh"},
+{t:"Add execute for everyone",d:"<code>a+x</code> adds execute to owner, group, and other.",code:"chmod a+x /tmp/script.sh"},
+{t:"Recursive change on a directory",d:"<code>-R</code> descends into every subdirectory. Be careful: it applies the same bits to files and to directories.",code:"chmod -R 755 /var/www/html"}]},
+{sc:"Change the owner of <code>/var/data/report.txt</code> to user <code>alice</code> and group <code>finance</code>.",tags:["chown"],check:[["chown alice:finance /var/data/report.txt"]],steps:[
+{t:"Change both owner and group at once",d:"<code>chown USER:GROUP FILE</code> sets both in one command. A dot (<code>.</code>) is also accepted but colon is standard.",code:"chown alice:finance /var/data/report.txt"},
+{t:"Change only the group",d:"<code>chgrp</code> changes the group only. Alternatively <code>chown :finance FILE</code> does the same (user omitted).",code:"chgrp finance /var/data/report.txt"},
+{t:"Recursive change",d:"<code>-R</code> applies the change to every file and subdirectory under the target.",code:"chown -R alice:finance /var/data/"}]},
+{sc:"You need the syntax of <code>nmcli</code> but have no internet access. Find the manual page, then search every man page related to <code>firewall</code>.",tags:["man","doc"],check:[["man nmcli","man -k firewall"],["man nmcli","apropos firewall"]],steps:[
+{t:"Read the manual page of a command",d:"<code>man CMD</code> opens the man page. Navigate with arrow keys, search with <code>/pattern</code>, quit with <code>q</code>. Man pages are divided into sections: 1 user commands, 5 file formats, 8 admin commands. <code>man 5 passwd</code> shows the file format, not the command.",code:"man nmcli"},
+{t:"Search by keyword across all man pages",d:"<code>man -k KEYWORD</code> (equivalent to <code>apropos</code>) searches short descriptions of every installed man page. If results are empty, rebuild the index first with <code>mandb</code>.",code:"mandb\nman -k firewall\napropos firewall"},
+{t:"Display info documentation",d:"<code>info</code> is an alternative help system used by the GNU project. Some commands have richer info pages than man pages.",code:"info coreutils"},
+{t:"Package documentation in /usr/share/doc",d:"Many packages ship configuration examples, READMEs and sample files here — very useful when offline.",code:"ls /usr/share/doc/httpd/"}]},
+{sc:"Find every file named <code>*.conf</code> under <code>/etc</code> that was modified in the last 7 days.",tags:["find"],check:[["find /etc","-name","*.conf","-mtime -7"]],steps:[
+{t:"Syntax of find",d:"<code>find PATH EXPRESSION</code>. <code>-name 'PATTERN'</code> matches filenames (glob patterns, not regex). Wrap patterns in quotes so the shell does not expand them.",code:"find /etc -name '*.conf'"},
+{t:"Filter by modification time",d:"<code>-mtime N</code> matches files modified exactly N days ago. <code>-mtime -7</code> means <b>less than 7 days ago</b>, <code>-mtime +7</code> means more than 7 days ago. Similar flags: <code>-atime</code> (access), <code>-ctime</code> (inode change).",code:"find /etc -name '*.conf' -mtime -7"},
+{t:"Filter by size, type, owner, permissions",d:"<code>-type f</code> regular files, <code>-type d</code> directories, <code>-type l</code> symlinks. <code>-size +10M</code> files bigger than 10 MB. <code>-user alice</code>, <code>-perm 0644</code>.",code:"find /var/log -type f -size +10M"},
+{t:"Run an action on each match",d:"<code>-exec CMD {} \\;</code> runs CMD on every match, replacing <code>{}</code> with the file path. End with <code>\\;</code>. Use <code>-delete</code> as a shortcut for deletion.",code:"find /tmp -type f -mtime +30 -exec rm -f {} \\;"}]},
+{sc:"Replace every occurrence of <code>DEBUG</code> with <code>INFO</code> in <code>/tmp/app.log</code> and save in place.",tags:["sed"],check:[["sed -i","s/debug/info","/tmp/app.log"]],steps:[
+{t:"Basic substitution",d:"<code>sed 's/OLD/NEW/'</code> replaces the <b>first</b> occurrence per line. Add <code>g</code> at the end (<code>s/OLD/NEW/g</code>) to replace all occurrences on each line.",code:"sed 's/DEBUG/INFO/g' /tmp/app.log"},
+{t:"Edit the file in place",d:"<code>-i</code> writes the result back to the same file. Without it, sed only prints to stdout. <code>-i.bak</code> also keeps a backup <code>.bak</code> copy.",code:"sed -i 's/DEBUG/INFO/g' /tmp/app.log"},
+{t:"Print only certain lines",d:"<code>-n</code> silences auto-print. Combined with <code>p</code> in a command, it prints only matching lines.",code:"sed -n '/ERROR/p' /var/log/messages"},
+{t:"Delete matching lines",d:"<code>/PATTERN/d</code> deletes lines that match the pattern.",code:"sed -i '/^#/d' /etc/ssh/sshd_config"}]},
+{sc:"Display the last 20 lines of <code>/var/log/messages</code> and then follow the file live to watch new entries.",tags:["tail","view"],check:[["tail","-n 20","/var/log/messages","tail -f"],["tail -20","/var/log/messages","tail -f"]],steps:[
+{t:"Print the last N lines",d:"<code>tail -n N FILE</code> (or the shortcut <code>tail -N</code>) prints the last N lines. Default is 10.",code:"tail -n 20 /var/log/messages"},
+{t:"Follow a file in real time",d:"<code>-f</code> (follow) keeps the process running and prints new lines as they are appended. Very useful on log files. Stop with <kbd>Ctrl-C</kbd>.",code:"tail -f /var/log/messages"},
+{t:"Show the beginning of a file",d:"<code>head</code> works the opposite way: <code>head -n 5 FILE</code> shows the first 5 lines.",code:"head -n 5 /etc/passwd"},
+{t:"Browse interactively with less",d:"<code>less</code> is a pager — <kbd>Space</kbd>/<kbd>b</kbd> to scroll, <code>/pattern</code> to search, <code>q</code> to quit.",code:"less /var/log/messages"}]}
+]},
+{cat:"Software Management",questions:[
+{sc:"Configure a local BaseOS repository pointing to <code>http://content.example.com/rhel10/BaseOS</code>, then refresh the cache and confirm dnf sees it.",tags:["dnf","repo"],check:[["/etc/yum.repos.d/","baseurl=http://content.example.com/rhel10/baseos","enabled=1"]],persist:true,steps:[
+{t:"Create a .repo file under /etc/yum.repos.d/",d:"Any file with the <code>.repo</code> extension in that directory is read by <code>dnf</code>. Use a clear filename.",code:"vim /etc/yum.repos.d/local.repo"},
+{t:"Fill in the repository definition",d:"A repo block needs at least three keys: a unique ID in square brackets, a <code>name</code> (human readable), and a <code>baseurl</code> (or <code>mirrorlist</code>). <code>enabled=1</code> turns it on. <code>gpgcheck=0</code> disables signature verification — you should keep it on in production with a <code>gpgkey=</code> entry.",code:"[BaseOS]\nname=Local BaseOS\nbaseurl=http://content.example.com/rhel10/BaseOS\nenabled=1\ngpgcheck=0"},
+{t:"Make dnf notice the new repo",d:"<code>dnf repolist</code> queries every enabled repo. <code>dnf repoinfo NAME</code> shows the details.",code:"dnf repolist\ndnf repoinfo BaseOS"},
+{t:"Clean and rebuild cache if needed",d:"After editing a repo file, or when a repo has changed upstream, force dnf to rebuild its metadata cache.",code:"dnf clean all\ndnf makecache"}]},
+{sc:"Install <code>httpd</code>, update every installed package, then remove <code>tcpdump</code>.",tags:["dnf"],check:[["dnf install","httpd","dnf update","dnf remove","tcpdump"]],steps:[
+{t:"Search for a package by keyword",d:"<code>dnf search KEYWORD</code> looks through package names and descriptions.",code:"dnf search httpd"},
+{t:"Install a package",d:"<code>-y</code> answers yes to every prompt, required in scripts and recommended on exams so you don't get stuck on a prompt.",code:"dnf install -y httpd"},
+{t:"Upgrade every package on the system",d:"<code>dnf update</code> and <code>dnf upgrade</code> are synonyms; they bring every installed package to its latest version available in the enabled repos.",code:"dnf update -y"},
+{t:"Remove a package",d:"<code>dnf remove PKG</code> uninstalls the package and any dependency that only it required.",code:"dnf remove -y tcpdump"},
+{t:"Install a package group",d:"Groups are sets of related packages, e.g. <code>Development Tools</code> includes gcc, make, git, etc.",code:"dnf groupinstall -y \"Development Tools\""},
+{t:"Find which package provides a file",d:"Very useful when you know the binary but not the package.",code:"dnf provides /usr/bin/dig"}]},
+{sc:"<b>New in RHEL 10.</b> Add the Flathub remote so you can install Flatpak applications.",tags:["flatpak","new"],persist:true,check:[["flatpak remote-add","flathub","https://flathub.org/repo/flathub.flatpakrepo"]],steps:[
+{t:"Make sure flatpak is installed",d:"On RHEL 10 server, the <code>flatpak</code> package may not be installed by default.",code:"dnf install -y flatpak"},
+{t:"Add the remote (repository)",d:"A Flatpak <b>remote</b> is the equivalent of a dnf repository. Flathub is the community-run remote used by most Flatpak apps. <code>--if-not-exists</code> avoids an error if the remote is already configured.",code:"flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"},
+{t:"List configured remotes",d:"Verifies that Flathub is registered. The output shows the remote name and its URL.",code:"flatpak remotes"},
+{t:"User vs system remotes",d:"By default <code>flatpak remote-add</code> runs as root and adds a system-wide remote. Use <code>--user</code> to install only for the current user (no root required).",code:"flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo"}]},
+{sc:"<b>New in RHEL 10.</b> Install the Flatpak application <code>org.gnome.gedit</code> from Flathub, then uninstall it.",tags:["flatpak","new"],check:[["flatpak install","org.gnome.gedit","flatpak uninstall","org.gnome.gedit"]],steps:[
+{t:"Search available apps",d:"<code>flatpak search</code> queries every registered remote.",code:"flatpak search gedit"},
+{t:"Install from a specific remote",d:"Applications are identified by a reverse-DNS ID (<code>org.gnome.gedit</code>). Naming the remote explicitly avoids ambiguity when several remotes carry the same app.",code:"flatpak install -y flathub org.gnome.gedit"},
+{t:"List installed apps and run one",d:"<code>flatpak list</code> shows everything installed. <code>flatpak run APP_ID</code> launches it.",code:"flatpak list\nflatpak run org.gnome.gedit"},
+{t:"Update and uninstall",d:"<code>flatpak update</code> refreshes every installed app. <code>flatpak uninstall --unused</code> removes runtimes no longer needed by any app.",code:"flatpak update -y\nflatpak uninstall -y org.gnome.gedit\nflatpak uninstall --unused -y"}]},
+{sc:"Install or update the kernel in a way that keeps the previous kernel bootable as a fallback.",tags:["kernel"],check:[["dnf","kernel"]],steps:[
+{t:"Install or update the kernel package",d:"<code>dnf update kernel</code> <b>never removes</b> the previous kernel version. Several kernels can coexist — GRUB shows each entry. This is a safety design so you can always boot the old one if a new kernel is broken.",code:"dnf update -y kernel"},
+{t:"List installed kernels",d:"You can see every kernel currently present on the system.",code:"rpm -q kernel"},
+{t:"Check the default kernel",d:"<code>grubby --default-kernel</code> tells you which kernel GRUB will boot by default.",code:"grubby --default-kernel"},
+{t:"List all kernel entries known to GRUB",d:"Useful to see indices, paths, and arguments for every boot entry.",code:"grubby --info=ALL"}]},
+{sc:"Find out which RPM package provides the binary <code>/usr/sbin/httpd</code>.",tags:["rpm","query"],check:[["rpm -qf /usr/sbin/httpd"],["dnf provides /usr/sbin/httpd"]],steps:[
+{t:"Query the package that owns an installed file",d:"<code>rpm -qf FILE</code> (query file) returns the installed package that shipped this file.",code:"rpm -qf /usr/sbin/httpd"},
+{t:"Query files provided by an installed package",d:"<code>rpm -ql PKG</code> (query list) lists every file a package installed.",code:"rpm -ql httpd | head"},
+{t:"Query package metadata",d:"<code>rpm -qi PKG</code> gives a description, version, vendor, install date.",code:"rpm -qi httpd"},
+{t:"Search for providers of a file (even not-yet-installed)",d:"<code>dnf provides PATH</code> searches the repos for any package that ships the given file, even if you don't have it installed yet.",code:"dnf provides /usr/sbin/httpd"}]},
+{sc:"Install a downloaded RPM file <code>/root/foo-1.0.rpm</code> resolving its dependencies automatically.",tags:["rpm","local"],check:[["dnf install","/root/foo-1.0.rpm"],["rpm -i","/root/foo-1.0.rpm"]],steps:[
+{t:"Install a local RPM with dnf (resolves deps)",d:"Pointing <code>dnf install</code> at a file path makes it install that local RPM and pull its dependencies from the configured repos. This is the preferred modern way.",code:"dnf install -y /root/foo-1.0.rpm"},
+{t:"Install with rpm directly (no dep resolution)",d:"<code>rpm -i</code> installs, <code>-U</code> upgrades, <code>-v</code> verbose, <code>-h</code> progress hash marks. If the package has unresolved dependencies, rpm <b>fails</b> — unlike dnf.",code:"rpm -ivh /root/foo-1.0.rpm"}]}
+]},
+{cat:"Shell Scripts",questions:[
+{sc:"Write a script <code>/root/check.sh</code> that takes a path as its first argument and prints whether it is an existing file, an existing directory, or does not exist.",tags:["bash","script"],check:[["#!/bin/bash","if","-f","-d","$1","fi"]],steps:[
+{t:"Start with the shebang",d:"The first line <code>#!/bin/bash</code> tells the kernel which interpreter to use. Without it, the script runs under the caller's current shell.",code:"#!/bin/bash"},
+{t:"Conditional with if / elif / else / fi",d:"<code>if [ TEST ]; then ... elif [ TEST ]; then ... else ... fi</code>. The square brackets are in fact the <code>test</code> command. Every if block must be closed with <code>fi</code>.",code:"#!/bin/bash\nif [ -f \"$1\" ]; then\n    echo \"$1 is a regular file\"\nelif [ -d \"$1\" ]; then\n    echo \"$1 is a directory\"\nelse\n    echo \"$1 does not exist\"\nfi"},
+{t:"Make it executable and test",d:"A script needs the execute bit to run directly. Without it, you have to call <code>bash /path/script.sh</code>.",code:"chmod +x /root/check.sh\n/root/check.sh /etc/passwd\n/root/check.sh /tmp"},
+{t:"Common test flags",d:"<code>-f</code> regular file, <code>-d</code> directory, <code>-e</code> exists, <code>-r/-w/-x</code> readable/writable/executable, <code>-z</code> empty string, <code>-n</code> non-empty string, <code>=</code> string equality, <code>-eq -ne -lt -le -gt -ge</code> numeric comparisons."}]},
+{sc:"Write a script that creates 10 local users named <code>user1</code> through <code>user10</code>.",tags:["bash","loop"],check:[["#!/bin/bash","for","useradd","user$i"],["#!/bin/bash","while","useradd"]],steps:[
+{t:"Use a for loop with a sequence",d:"<code>{1..10}</code> is a Bash brace expansion that produces the numbers 1 2 3 ... 10. You can also use <code>$(seq 1 10)</code>. <code>do ... done</code> delimits the loop body.",code:"#!/bin/bash\nfor i in {1..10}; do\n    useradd \"user$i\"\ndone"},
+{t:"Loop over words read from a file",d:"<code>while read VAR; do ... done &lt; FILE</code> reads one line of <code>FILE</code> at a time into <code>$VAR</code>.",code:"#!/bin/bash\nwhile read u; do\n    useradd \"$u\"\ndone < /root/users.txt"},
+{t:"Loop over command output",d:"Using <code>$(command)</code> (command substitution) inside a for loop iterates over every word of the output.",code:"for user in $(awk -F: '$3>=1000 {print $1}' /etc/passwd); do\n    echo \"Found user $user\"\ndone"}]},
+{sc:"Write a script that prints its own name, the number of arguments it received, and each argument with its index.",tags:["bash","args"],check:[["#!/bin/bash","$0","$#","$@"],["#!/bin/bash","$0","$#","$1"]],steps:[
+{t:"Positional parameters",d:"<code>$0</code> is the name of the script as called. <code>$1</code>, <code>$2</code>, ..., <code>$9</code> are the first nine arguments. Beyond 9, use <code>${10}</code>. <code>$#</code> is the count of arguments. <code>$@</code> is all of them. Always quote <code>\"$@\"</code> to preserve arguments with spaces.",code:"#!/bin/bash\necho \"Script name : $0\"\necho \"Arg count   : $#\"\nn=1\nfor a in \"$@\"; do\n    echo \"Arg $n       : $a\"\n    n=$((n+1))\ndone"},
+{t:"Shift the arguments",d:"<code>shift</code> drops <code>$1</code> and renumbers the rest. Commonly used in loops parsing options.",code:"while [ $# -gt 0 ]; do\n    echo \"Processing: $1\"\n    shift\ndone"}]},
+{sc:"Write a script that counts the users whose login shell is <code>/bin/bash</code> and prints the number.",tags:["bash","substitution"],check:[["#!/bin/bash","$(","grep","/bin/bash","/etc/passwd"]],steps:[
+{t:"Capture command output in a variable",d:"The <code>$(command)</code> syntax runs the command and replaces itself with the command's stdout. The older backtick form <code>`command`</code> works too but is harder to nest.",code:"#!/bin/bash\ncount=$(grep -c '/bin/bash' /etc/passwd)\necho \"Users with bash shell: $count\""},
+{t:"Arithmetic expansion",d:"<code>$(( ... ))</code> does integer arithmetic. <code>$((a+b))</code>, <code>$((n+1))</code>.",code:"total=$(( count * 2 ))"},
+{t:"Check exit status",d:"Every command sets <code>$?</code> to its exit code. 0 = success, non-zero = failure. Test it with <code>if</code> or chain with <code>&amp;&amp;</code> / <code>||</code>.",code:"systemctl is-active sshd\nif [ $? -eq 0 ]; then\n    echo \"SSH is running\"\nfi"}]},
+{sc:"Write a script that exits with code 1 if it is not run as root, and with code 2 if no argument was given.",tags:["bash","exit"],check:[["#!/bin/bash","exit 1","exit 2"]],steps:[
+{t:"Exit a script with a specific code",d:"<code>exit N</code> terminates immediately and sets the exit status to N. Useful for signaling specific error conditions to the caller.",code:"#!/bin/bash\nif [ \"$EUID\" -ne 0 ]; then\n    echo \"Must be run as root\" >&2\n    exit 1\nfi\nif [ $# -lt 1 ]; then\n    echo \"Usage: $0 <n>\" >&2\n    exit 2\nfi\necho \"Hello $1\""},
+{t:"Print errors to stderr",d:"<code>&gt;&amp;2</code> redirects stdout to stderr so that error messages appear on file descriptor 2, even if stdout is redirected elsewhere.",code:"echo \"error!\" >&2"}]}
+]},
+{cat:"Running Systems",questions:[
+{sc:"Reboot the system, then do a clean shutdown scheduled 5 minutes in the future with a broadcast message.",tags:["boot"],check:[["reboot","shutdown -h","+5"],["systemctl reboot","shutdown -h","+5"]],steps:[
+{t:"Immediate reboot",d:"<code>systemctl reboot</code> and <code>reboot</code> both request a full reboot through systemd. Any unit marked as important is cleanly stopped first.",code:"systemctl reboot\nreboot"},
+{t:"Immediate power off",d:"Halts every service then shuts the machine down.",code:"systemctl poweroff\npoweroff"},
+{t:"Scheduled shutdown with message",d:"<code>shutdown -h TIME MESSAGE</code>. <code>-h</code> halts the machine, <code>-r</code> reboots. <code>TIME</code> can be <code>now</code>, <code>+N</code> (minutes), or <code>HH:MM</code>. The message is broadcast to logged-in users.",code:"shutdown -h +5 'Maintenance in 5 minutes'"},
+{t:"Cancel a pending shutdown",d:"<code>-c</code> cancels any pending shutdown.",code:"shutdown -c"}]},
+{sc:"Boot the system into <code>rescue.target</code> from the GRUB menu for a one-off troubleshooting session.",tags:["target","grub"],check:[["systemd.unit=rescue.target"]],steps:[
+{t:"List available targets",d:"Targets are the systemd equivalent of old SysV runlevels. <code>multi-user.target</code> = runlevel 3, <code>graphical.target</code> = runlevel 5, <code>rescue.target</code> = single-user.",code:"systemctl list-units --type=target"},
+{t:"Switch target without reboot",d:"<code>systemctl isolate TARGET</code> transitions to a target immediately, starting and stopping units as needed. It is <b>not persistent</b>.",code:"systemctl isolate multi-user.target"},
+{t:"Boot once into a specific target from GRUB",d:"At the GRUB menu, select the kernel entry and press <kbd>e</kbd>. Find the line that starts with <code>linux</code> and append <code>systemd.unit=rescue.target</code> at the very end. Then press <kbd>Ctrl-X</kbd> or <kbd>F10</kbd> to boot. The change is for this boot only.",code:"systemd.unit=rescue.target"},
+{t:"Persistent default target",d:"<code>systemctl set-default TARGET</code> makes a target the default on every boot.",code:"systemctl set-default multi-user.target"}]},
+{sc:"<b>Critical skill.</b> You lost the root password. Recover it without reinstalling the system.",tags:["root","boot","critical"],check:[["rd.break","mount -o remount,rw /sysroot","chroot /sysroot","passwd","/.autorelabel"]],steps:[
+{t:"Edit the kernel command line at boot",d:"At the GRUB menu, select the default kernel and press <kbd>e</kbd>. Find the long line beginning with <code>linux</code> and append the parameters at the end. This runs only for this boot.",code:"rd.break enforcing=0"},
+{t:"What these parameters do",d:"<code>rd.break</code> asks the initramfs to drop you into a root shell <b>before</b> the real root filesystem is mounted as <code>/</code>. <code>enforcing=0</code> boots SELinux in permissive mode so that touching <code>/etc/shadow</code> does not get blocked — you'll fix labels later."},
+{t:"Boot with the modified line",d:"Press <kbd>Ctrl-X</kbd> (or <kbd>F10</kbd>). You land in a minimal emergency shell with the real root filesystem mounted read-only on <code>/sysroot</code>."},
+{t:"Remount /sysroot read-write, then chroot into it",d:"At this point, <code>/</code> in your shell is still the initramfs. To use <code>passwd</code> against the real <code>/etc/shadow</code>, you need to chroot into <code>/sysroot</code>. But first you must make it writable.",code:"mount -o remount,rw /sysroot\nchroot /sysroot"},
+{t:"Change the root password",d:"You are now inside the real system as root. Set a new password.",code:"passwd root"},
+{t:"Force SELinux relabel at next boot",d:"Because SELinux was permissive, the new <code>/etc/shadow</code> may have an incorrect context. Creating <code>/.autorelabel</code> asks the next boot to relabel every file, then reboot normally. You can skip the full relabel by using <code>restorecon -v /etc/shadow</code> before exiting instead.",code:"touch /.autorelabel\nexit\nexit"}]},
+{sc:"List the top 5 most CPU-consuming processes, then kill the process with PID <code>1234</code> gracefully; if it does not stop, force it.",tags:["processes"],check:[["ps","--sort=-%cpu","kill 1234","kill -9 1234"],["top","kill 1234","kill -9 1234"]],steps:[
+{t:"Live interactive view with top",d:"<code>top</code> refreshes every few seconds. Press <kbd>P</kbd> to sort by CPU, <kbd>M</kbd> by memory, <kbd>N</kbd> by PID. Press <kbd>q</kbd> to quit.",code:"top"},
+{t:"Snapshot sorted by CPU",d:"<code>ps aux --sort=-%cpu</code>: the minus sign sorts descending. <code>head -6</code> prints the header plus the top 5.",code:"ps aux --sort=-%cpu | head -6"},
+{t:"Sorted by memory",d:"Same pattern, different column.",code:"ps aux --sort=-%mem | head -6"},
+{t:"Send SIGTERM (graceful kill)",d:"<code>kill PID</code> sends signal 15 (SIGTERM), asking the process to terminate cleanly. This is the default and polite way.",code:"kill 1234"},
+{t:"Send SIGKILL (force)",d:"If a process ignores SIGTERM, <code>kill -9 PID</code> sends SIGKILL, which cannot be caught. The kernel forcibly terminates the process; open files may be left inconsistent.",code:"kill -9 1234"},
+{t:"Kill by name instead of PID",d:"<code>pkill</code> and <code>killall</code> match by process name. Handy when you don't know the PID.",code:"pkill -9 firefox"}]},
+{sc:"Launch <code>/root/backup.sh</code> with a low CPU priority (nice value 10), then change the priority of an already running process (PID 2345) to -5.",tags:["nice","renice"],check:[["nice -n 10","/root/backup.sh","renice","-5","2345"]],steps:[
+{t:"What is niceness",d:"The niceness value ranges from <b>-20 (highest priority)</b> to <b>+19 (lowest priority)</b>. Default is 0. Only root can set a negative niceness (raise priority above the default)."},
+{t:"Start a command with a given niceness",d:"<code>nice -n VAL CMD</code> starts CMD with that niceness.",code:"nice -n 10 /root/backup.sh"},
+{t:"Change the niceness of a running process",d:"<code>renice -n VAL -p PID</code> modifies a running process. <code>-u USER</code> targets every process owned by a user; <code>-g GROUP</code> targets a process group.",code:"renice -n -5 -p 2345"},
+{t:"Check the niceness",d:"<code>ps -eo pid,ni,cmd</code> prints each process with its niceness column.",code:"ps -eo pid,ni,cmd | grep backup"}]},
+{sc:"Switch the active tuned profile to <code>throughput-performance</code> for a server doing heavy compute.",tags:["tuned"],persist:true,check:[["tuned-adm profile throughput-performance"]],steps:[
+{t:"Make sure tuned is installed and running",d:"<code>tuned</code> is a dynamic kernel tuning daemon shipped by Red Hat. It applies sets of sysctl and device-level tweaks appropriate for a given workload.",code:"dnf install -y tuned\nsystemctl enable --now tuned"},
+{t:"List and inspect profiles",d:"<code>tuned-adm list</code> shows every available profile. <code>tuned-adm active</code> shows the current one. <code>tuned-adm recommend</code> asks tuned which profile best matches the hardware/role.",code:"tuned-adm list\ntuned-adm active\ntuned-adm recommend"},
+{t:"Apply a profile",d:"The profile is saved to <code>/etc/tuned/active_profile</code> and is restored on reboot.",code:"tuned-adm profile throughput-performance"},
+{t:"Disable tuned entirely",d:"<code>tuned-adm off</code> unsets the profile and returns to kernel defaults.",code:"tuned-adm off"}]},
+{sc:"Show every message logged by the <code>sshd</code> service today, then only the messages of error severity or worse since the last boot.",tags:["journal"],check:[["journalctl -u sshd","journalctl","-p err","-b"],["journalctl -u sshd","journalctl","-p 3","-b"]],steps:[
+{t:"Show every journal entry",d:"<code>journalctl</code> with no arguments paginates the entire journal from oldest to newest. Press <code>q</code> to quit.",code:"journalctl"},
+{t:"Filter by unit (service)",d:"<code>-u UNIT</code> filters to entries produced by a given systemd unit.",code:"journalctl -u sshd"},
+{t:"Filter by priority",d:"Levels: <code>emerg</code> 0, <code>alert</code> 1, <code>crit</code> 2, <code>err</code> 3, <code>warning</code> 4, <code>notice</code> 5, <code>info</code> 6, <code>debug</code> 7. <code>-p err</code> shows err and everything more severe.",code:"journalctl -p err -b"},
+{t:"Filter by time window",d:"<code>--since</code> and <code>--until</code> accept <code>today</code>, <code>yesterday</code>, <code>'1 hour ago'</code>, or an exact <code>YYYY-MM-DD HH:MM</code> timestamp.",code:"journalctl --since today\njournalctl --since '2026-04-17 08:00' --until '2026-04-17 18:00'"},
+{t:"Filter by boot",d:"<code>-b</code> limits to the current boot, <code>-b -1</code> to the previous one. <code>--list-boots</code> enumerates them.",code:"journalctl -b\njournalctl --list-boots"},
+{t:"Follow live",d:"<code>-f</code> acts like <code>tail -f</code>.",code:"journalctl -f"}]},
+{sc:"Make systemd journals persistent across reboots.",tags:["journal"],persist:true,check:[["mkdir","/var/log/journal"],["storage=persistent","systemctl restart systemd-journald"]],steps:[
+{t:"Default behaviour",d:"By default systemd-journald stores the journal in <code>/run/log/journal</code>, which is a tmpfs — it is wiped at every reboot."},
+{t:"Enable persistence by creating the target directory",d:"Simply creating <code>/var/log/journal</code> is enough: systemd-journald detects it at startup and begins writing there. The directory needs the right permissions and SELinux context.",code:"mkdir -p /var/log/journal\nsystemd-tmpfiles --create --prefix /var/log/journal"},
+{t:"Alternative: configure it explicitly",d:"Edit <code>/etc/systemd/journald.conf</code> and set <code>Storage=persistent</code>. Then restart journald.",code:"vim /etc/systemd/journald.conf\n# set:  Storage=persistent\n\nsystemctl restart systemd-journald"},
+{t:"Verify by listing boots",d:"If the journal spans multiple boots, persistence is working.",code:"journalctl --list-boots"}]},
+{sc:"Make <code>httpd</code> start at boot and right now, and verify it is enabled.",tags:["systemctl"],check:[["systemctl enable --now httpd"],["systemctl enable httpd --now"]],steps:[
+{t:"Enable and start in one go",d:"<code>--now</code> is a shortcut: when enabling, it also starts the unit immediately; when disabling, it also stops it.",code:"systemctl enable --now httpd"},
+{t:"Check current state",d:"<code>is-enabled</code> tells you if it starts at boot. <code>is-active</code> tells you if it is currently running. <code>status</code> gives both plus the last log lines.",code:"systemctl is-enabled httpd\nsystemctl is-active httpd\nsystemctl status httpd"},
+{t:"Stop, start, restart, reload",d:"<code>reload</code> asks the service to re-read its configuration without a full restart (only works if the service supports it).",code:"systemctl stop httpd\nsystemctl start httpd\nsystemctl restart httpd\nsystemctl reload httpd"},
+{t:"Mask a service",d:"<code>mask</code> makes a unit impossible to start, even manually. It symlinks the unit file to <code>/dev/null</code>. Reversed with <code>unmask</code>. Use on services that keep coming back to life through dependencies.",code:"systemctl mask cups\nsystemctl unmask cups"}]},
+{sc:"Copy <code>/root/data.tar.gz</code> to <code>servera:/tmp/</code>, then sync the directory <code>/var/www/</code> to <code>serverb:/backup/</code>.",tags:["scp","rsync"],check:[["scp /root/data.tar.gz","servera:/tmp/","rsync","-a","/var/www/","serverb:/backup/"]],steps:[
+{t:"Single file copy with scp",d:"<code>scp</code> is ssh-based copy. Syntax <code>scp SRC DST</code> where either side can be <code>user@host:path</code>. It transfers the file over SSH, re-authenticating each time.",code:"scp /root/data.tar.gz student@servera:/tmp/"},
+{t:"Recursive directory copy with scp",d:"<code>-r</code> recurses into directories.",code:"scp -r /etc/httpd student@servera:/tmp/"},
+{t:"Efficient sync with rsync",d:"<code>rsync</code> only transfers the parts that changed. <code>-a</code> (archive) preserves permissions, ownership, timestamps, and symlinks. <code>-v</code> verbose, <code>-z</code> compresses during transfer, <code>--delete</code> removes files on the destination that no longer exist on the source.",code:"rsync -avz /var/www/ student@serverb:/backup/"},
+{t:"Trailing slash matters",d:"<code>rsync /src/ /dst</code> copies the <b>contents</b> of <code>/src</code> into <code>/dst</code>. <code>rsync /src /dst</code> (no trailing slash) creates <code>/dst/src</code>."},
+{t:"Interactive file transfer with sftp",d:"<code>sftp</code> opens an interactive shell similar to FTP but over SSH. Useful when you want to browse before copying.",code:"sftp student@servera"}]}
+]},
+{cat:"Local Storage",questions:[
+{sc:"On disk <code>/dev/vdb</code>, create a new GPT partition of 2 GiB.",tags:["partition","gpt"],persist:true,check:[["parted /dev/vdb","mklabel gpt","mkpart"],["gdisk /dev/vdb"]],steps:[
+{t:"Inspect the current layout",d:"<code>lsblk</code> shows block devices in a tree view. <code>fdisk -l /dev/vdb</code> prints the partition table.",code:"lsblk\nfdisk -l /dev/vdb"},
+{t:"Create a GPT label (once per disk)",d:"<code>mklabel gpt</code> writes a fresh GPT partition table. <b>This destroys existing partitions</b> — only run on a new disk.",code:"parted /dev/vdb mklabel gpt"},
+{t:"Create the partition with parted",d:"<code>mkpart</code> followed by a partition type, filesystem type hint, start and end. Sizes like <code>1MiB</code>, <code>2049MiB</code> are binary megabytes. Parted also accepts <code>0%</code> and <code>100%</code>.",code:"parted /dev/vdb mkpart primary 1MiB 2049MiB\nparted /dev/vdb print"},
+{t:"Alternative: interactive gdisk",d:"<code>gdisk</code> is the GPT equivalent of <code>fdisk</code>. Inside: <code>n</code> new, <code>t</code> type, <code>w</code> write, <code>q</code> quit.",code:"gdisk /dev/vdb"},
+{t:"Force the kernel to re-read the partition table",d:"Without this, <code>/dev/vdb1</code> may not appear as a device node until reboot.",code:"partprobe /dev/vdb\nlsblk /dev/vdb"}]},
+{sc:"Initialize <code>/dev/vdb1</code> and <code>/dev/vdb2</code> as LVM physical volumes.",tags:["lvm","pv"],check:[["pvcreate","/dev/vdb1","/dev/vdb2"]],steps:[
+{t:"Why LVM",d:"LVM decouples logical volumes from physical devices. You can grow, shrink, move, snapshot without touching the applications above. It adds one layer: <b>physical volume (PV) → volume group (VG) → logical volume (LV)</b>."},
+{t:"Install lvm2 if missing",d:"Should be present on RHEL by default.",code:"dnf install -y lvm2"},
+{t:"Mark a device as a PV",d:"<code>pvcreate</code> writes LVM metadata at the start of the device. The device must exist and not be in use. You can pass several at once.",code:"pvcreate /dev/vdb1 /dev/vdb2"},
+{t:"Inspect",d:"<code>pvs</code> short summary, <code>pvdisplay</code> full info.",code:"pvs\npvdisplay /dev/vdb1"},
+{t:"Remove a PV",d:"<code>pvremove</code> wipes the metadata. The PV must not belong to a VG.",code:"pvremove /dev/vdb2"}]},
+{sc:"Create a volume group named <code>vgdata</code> from <code>/dev/vdb1</code>, then extend it with <code>/dev/vdb2</code>.",tags:["lvm","vg"],check:[["vgcreate vgdata /dev/vdb1","vgextend vgdata /dev/vdb2"]],steps:[
+{t:"Create the VG",d:"<code>vgcreate NAME DEV...</code> groups one or more PVs into a named pool of storage.",code:"vgcreate vgdata /dev/vdb1"},
+{t:"Grow the VG",d:"Adding a PV gives the VG more free extents to allocate to logical volumes.",code:"vgextend vgdata /dev/vdb2"},
+{t:"Shrink the VG",d:"<code>vgreduce</code> removes a PV from a VG. The PV must not carry any LV data (use <code>pvmove</code> first to move data off).",code:"vgreduce vgdata /dev/vdb2"},
+{t:"Customize the physical extent size",d:"By default PE (physical extent) size is 4 MiB. Change it at creation with <code>-s</code>; you can't change it afterwards.",code:"vgcreate -s 16M vgdata /dev/vdb1"},
+{t:"Inspect",d:"",code:"vgs\nvgdisplay vgdata"}]},
+{sc:"Create a 1 GiB logical volume named <code>lvweb</code> in <code>vgdata</code>, format it as xfs, and mount it on <code>/web</code>.",tags:["lvm","lv"],check:[["lvcreate","-l 1g","-n lvweb","vgdata","mkfs.xfs","mount"]],steps:[
+{t:"Create the logical volume",d:"<code>-L SIZE</code> uses absolute sizes (1G, 500M...). <code>-l N%FREE</code> uses a percentage of the free space in the VG. <code>-n NAME</code> names the LV.",code:"lvcreate -L 1G -n lvweb vgdata"},
+{t:"Create an LV using all remaining space",d:"",code:"lvcreate -l 100%FREE -n lvweb vgdata"},
+{t:"Format",d:"<code>mkfs.xfs DEVICE</code> makes an XFS filesystem. The device path of an LV is <code>/dev/VG/LV</code> (also <code>/dev/mapper/VG-LV</code>).",code:"mkfs.xfs /dev/vgdata/lvweb"},
+{t:"Mount",d:"",code:"mkdir /web\nmount /dev/vgdata/lvweb /web"},
+{t:"Remove an LV",d:"Unmount first; <code>lvremove</code> destroys the LV and the data on it.",code:"umount /web\nlvremove /dev/vgdata/lvweb"}]},
+{sc:"Configure <code>/dev/vgdata/lvweb</code> to be mounted automatically on <code>/web</code> at every boot, using its UUID.",tags:["fstab","uuid"],persist:true,check:[["uuid=","/web","xfs","defaults"]],steps:[
+{t:"Find the UUID",d:"<code>blkid</code> prints the UUID, label, and filesystem type of every block device with a filesystem on it. <code>lsblk -f</code> also shows the same info in tree form.",code:"blkid /dev/vgdata/lvweb\nlsblk -f"},
+{t:"Add a line to /etc/fstab",d:"Fields (space or tab separated): <b>source, mountpoint, fstype, options, dump (0), fsck (0 for no check)</b>. Preferring UUID or LABEL over device names avoids breakage if device names shift.",code:"UUID=XXXX-XXXX  /web  xfs  defaults  0 0"},
+{t:"Reload systemd's view of /etc/fstab",d:"systemd generates mount units from /etc/fstab at boot; after editing, reload so that the changes are picked up now.",code:"systemctl daemon-reload"},
+{t:"Test without rebooting",d:"<code>mount -a</code> mounts every entry from fstab that isn't already mounted. <b>If it fails, fix the fstab before rebooting</b> or the system will drop into emergency mode.",code:"mount -a\ndf -h /web"}]},
+{sc:"Add 512 MiB of swap space using partition <code>/dev/vdb3</code>, without disabling the existing swap.",tags:["swap"],persist:true,check:[["mkswap /dev/vdb3","swapon /dev/vdb3","swap"]],steps:[
+{t:"Inspect current swap",d:"<code>swapon --show</code> lists every swap device. <code>free -h</code> shows total swap usage.",code:"swapon --show\nfree -h"},
+{t:"Create a partition with type <i>Linux swap</i>",d:"Before mkswap, the partition must exist. In <code>parted</code>, use <code>mkpart primary linux-swap 0% 512M</code>. In <code>gdisk</code>, change the type code to <code>8200</code>."},
+{t:"Format the partition as swap",d:"<code>mkswap</code> writes the swap signature and a UUID.",code:"mkswap /dev/vdb3"},
+{t:"Activate immediately",d:"<code>swapon</code> adds the device to the kernel's active swap pool.",code:"swapon /dev/vdb3"},
+{t:"Make it persistent via fstab",d:"A swap entry uses <code>swap</code> as the filesystem type and <code>none</code> as the mountpoint.",code:"blkid /dev/vdb3\n# then add to /etc/fstab:\nUUID=XXXX  none  swap  defaults  0 0"}]},
+{sc:"The LV <code>/dev/vgdata/lvweb</code> is full. Grow it by 500 MiB and extend the XFS filesystem on it.",tags:["lvm","resize"],check:[["lvextend","+500m","lvweb","-r"],["lvextend","+500m","lvweb","xfs_growfs"]],steps:[
+{t:"Check VG free space",d:"If the VG has no free extents, you need to add a new PV first (<code>pvcreate</code> + <code>vgextend</code>).",code:"vgs vgdata"},
+{t:"Grow the LV and the filesystem together",d:"<code>-L +500M</code> <b>adds</b> 500 MiB (as opposed to <code>-L 500M</code> which would set the absolute size). <code>-r</code> (resize filesystem) also resizes the filesystem living on top, automatically calling <code>xfs_growfs</code> or <code>resize2fs</code>.",code:"lvextend -L +500M -r /dev/vgdata/lvweb"},
+{t:"Manual way for XFS",d:"<code>xfs_growfs</code> takes the <b>mountpoint</b>, not the device. XFS can only grow, never shrink.",code:"lvextend -L +500M /dev/vgdata/lvweb\nxfs_growfs /web"},
+{t:"Manual way for ext4",d:"<code>resize2fs</code> takes the device and can grow or shrink.",code:"lvextend -L +500M /dev/vgdata/lvweb\nresize2fs /dev/vgdata/lvweb"},
+{t:"Verify",d:"",code:"df -h /web\nlvs"}]},
+{sc:"Reduce the size of an ext4 logical volume <code>/dev/vgdata/lvdata</code> from 2 GiB to 1 GiB.",tags:["lvm","shrink"],check:[["umount","e2fsck -f","resize2fs","lvdata 1g","lvreduce","1g","lvdata"]],steps:[
+{t:"Warning: ext4 only, NEVER xfs",d:"XFS filesystems <b>cannot</b> be shrunk — only ext4 (and a few others). Shrinking is risky: back up first."},
+{t:"Unmount the filesystem",d:"You cannot resize a mounted ext4 filesystem to a smaller size.",code:"umount /data"},
+{t:"Force a consistency check",d:"<code>e2fsck -f</code> is mandatory before shrinking.",code:"e2fsck -f /dev/vgdata/lvdata"},
+{t:"Shrink the filesystem FIRST",d:"Always shrink the filesystem before the LV; otherwise you truncate usable data.",code:"resize2fs /dev/vgdata/lvdata 1G"},
+{t:"Shrink the LV to match",d:"",code:"lvreduce -L 1G /dev/vgdata/lvdata"},
+{t:"Remount and verify",d:"",code:"mount /dev/vgdata/lvdata /data\ndf -h /data"}]}
+]},
+{cat:"File Systems",questions:[
+{sc:"Create an ext4 filesystem on <code>/dev/vdb4</code> with the label <code>DATA</code> and mount it persistently on <code>/data</code>.",tags:["ext4"],persist:true,check:[["mkfs.ext4","-l data","/dev/vdb4","/data","ext4","defaults"]],steps:[
+{t:"Format with a label",d:"<code>mkfs.ext4 -L LABEL DEV</code> sets the filesystem label at creation time. Labels make /etc/fstab readable.",code:"mkfs.ext4 -L DATA /dev/vdb4"},
+{t:"Mount and add to fstab",d:"You can mount by UUID (<code>blkid</code> to get it) or by label.",code:"mkdir /data\nblkid /dev/vdb4\n# add to /etc/fstab:\nUUID=xxxx  /data  ext4  defaults  0 0\n\nmount -a\ndf -hT /data"},
+{t:"Change the label of an existing ext4 filesystem",d:"<code>e2label</code> updates the label without reformatting.",code:"e2label /dev/vdb4 DATA2"}]},
+{sc:"Format <code>/dev/vdb5</code> as XFS with the label <code>XFSDATA</code> and mount it on <code>/srv/xfs</code> persistently.",tags:["xfs"],persist:true,check:[["mkfs.xfs","/dev/vdb5","/srv/xfs","xfs","defaults"]],steps:[
+{t:"Create the filesystem",d:"<code>-L</code> sets the label at creation time. If you forget, <code>xfs_admin -L</code> can add it later.",code:"mkfs.xfs -L XFSDATA /dev/vdb5"},
+{t:"Add a label after creation if needed",d:"Only works when the filesystem is unmounted.",code:"xfs_admin -L XFSDATA /dev/vdb5"},
+{t:"Mount persistently",d:"",code:"mkdir -p /srv/xfs\necho 'LABEL=XFSDATA /srv/xfs xfs defaults 0 0' >> /etc/fstab\nmount -a"},
+{t:"Inspect XFS-specific info",d:"<code>xfs_info MOUNTPOINT</code> prints geometry (block size, agcount, etc.).",code:"xfs_info /srv/xfs"}]},
+{sc:"Format <code>/dev/vdb6</code> as VFAT (FAT32) and mount it on <code>/mnt/usb</code> persistently.",tags:["vfat"],persist:true,check:[["mkfs.vfat","/dev/vdb6","/mnt/usb","vfat","defaults"]],steps:[
+{t:"Install dosfstools if needed",d:"Provides <code>mkfs.vfat</code>.",code:"dnf install -y dosfstools"},
+{t:"Format as FAT32",d:"<code>-F 32</code> forces 32-bit FAT; without it, <code>mkfs.vfat</code> picks 12 or 16 based on size.",code:"mkfs.vfat -F 32 /dev/vdb6"},
+{t:"Mount and persist",d:"",code:"mkdir -p /mnt/usb\nblkid /dev/vdb6\n# add to /etc/fstab:\nUUID=xxxx  /mnt/usb  vfat  defaults  0 0\n\nmount -a"}]},
+{sc:"Mount the NFS export <code>nfs.example.com:/exports/data</code> on <code>/mnt/nfs</code> so it is reconnected at every boot.",tags:["nfs","mount"],persist:true,check:[["nfs.example.com:/exports/data","/mnt/nfs","nfs","_netdev"]],steps:[
+{t:"Install the NFS client",d:"The <code>nfs-utils</code> package provides the client binaries and the systemd helpers.",code:"dnf install -y nfs-utils"},
+{t:"List the shares a server exports",d:"<code>showmount -e HOST</code> queries the remote <code>rpcbind</code>/<code>mountd</code>.",code:"showmount -e nfs.example.com"},
+{t:"Mount manually first to test",d:"<code>-t nfs</code> selects the filesystem type. If the server offers NFSv4, it is negotiated transparently.",code:"mkdir -p /mnt/nfs\nmount -t nfs nfs.example.com:/exports/data /mnt/nfs"},
+{t:"Persist in /etc/fstab",d:"The option <code>_netdev</code> marks the mount as requiring network — systemd then waits for <code>network-online.target</code> before attempting it.",code:"nfs.example.com:/exports/data  /mnt/nfs  nfs  defaults,_netdev  0 0"},
+{t:"Test",d:"",code:"mount -a\ndf -h /mnt/nfs"}]},
+{sc:"Use autofs to automount the NFS home of user <code>alice</code> (shared at <code>nfs.example.com:/home/alice</code>) on demand at <code>/home/alice</code>.",tags:["autofs","nfs"],persist:true,check:[["/etc/auto","alice","nfs.example.com:/home/alice"]],steps:[
+{t:"Install and enable autofs",d:"autofs watches directories and mounts remote paths only when they are accessed, unmounting them after an idle timeout.",code:"dnf install -y autofs\nsystemctl enable --now autofs"},
+{t:"Choose between direct and indirect maps",d:"A <b>direct</b> map mounts specific absolute paths listed in the map (good for a one-off mount point). An <b>indirect</b> map applies a pattern to everything under a parent directory."},
+{t:"Direct map example",d:"In the master file, <code>/-</code> says <i>direct map follows</i>. Then in <code>/etc/auto.direct</code> each line is the full mount point, options, and source.",code:"# /etc/auto.master.d/direct.autofs:\n/-  /etc/auto.direct\n\n# /etc/auto.direct:\n/home/alice  -rw,sync  nfs.example.com:/home/alice"},
+{t:"Indirect map example",d:"Here autofs watches <code>/home/guests</code>; when you cd into <code>/home/guests/NAME</code>, autofs mounts <code>nfs.example.com:/exports/NAME</code> on it. The <code>&amp;</code> is the matched key.",code:"# /etc/auto.master.d/guests.autofs:\n/home/guests  /etc/auto.guests\n\n# /etc/auto.guests:\n*  -rw,sync  nfs.example.com:/exports/&"},
+{t:"Reload autofs and test",d:"Accessing the path triggers the mount.",code:"systemctl reload autofs\nls /home/alice\nmount | grep alice"}]},
+{sc:"User <code>alice</code> cannot read <code>/var/data/report.txt</code>. Diagnose why.",tags:["perm","debug"],check:[["ls -l","/var/data/report.txt","id alice"],["ls -ld","/var/data","id alice"],["namei","/var/data/report.txt"]],steps:[
+{t:"Check the mode and ownership",d:"<code>ls -l</code> shows the permissions, owner and group. Alice needs either to own the file (and have <code>r</code>), or to be in its group (and group has <code>r</code>), or <code>o</code> has <code>r</code>.",code:"ls -l /var/data/report.txt\nls -ld /var/data"},
+{t:"Check Alice's groups",d:"<code>id</code> shows uid, gid, and all group memberships.",code:"id alice\ngroups alice"},
+{t:"Check path permissions",d:"To read a file you also need <code>x</code> on <b>every</b> parent directory. A <code>chmod 700</code> on <code>/var/data</code> would block alice even if the file is 644.",code:"namei -l /var/data/report.txt"},
+{t:"Check for ACLs",d:"ACLs can override the classic mode. The <code>+</code> in <code>ls -l</code> output signals ACLs; <code>getfacl</code> prints them.",code:"getfacl /var/data/report.txt"},
+{t:"Check SELinux and attributes",d:"A wrong SELinux context blocks access despite correct Unix permissions. The <code>i</code> (immutable) attribute blocks all writes, even root's.",code:"ls -Z /var/data/report.txt\nlsattr /var/data/report.txt"}]},
+{sc:"Create a shared collaboration directory <code>/srv/project</code> for the group <code>devs</code>: every file created there must automatically belong to <code>devs</code>.",tags:["setgid","collab"],persist:true,check:[["groupadd devs","chgrp devs /srv/project","chmod 2770"],["groupadd devs","chgrp devs /srv/project","chmod g+s","chmod","770"]],steps:[
+{t:"Create the group",d:"",code:"groupadd devs"},
+{t:"Create the directory and set its group",d:"",code:"mkdir -p /srv/project\nchgrp devs /srv/project"},
+{t:"Apply permissions with the SetGID bit",d:"Leading digit in 4-digit octal: <b>2</b> = setgid. So <code>2770</code> = setgid + rwx for owner and group, nothing for others. Every new file or subdirectory inside <i>inherits the directory's group</i> instead of the creator's primary group.",code:"chmod 2770 /srv/project"},
+{t:"Verify with ls",d:"You should see <code>drwxrws---</code>. The <code>s</code> in the group position indicates setgid is set (if execute was missing, it would be a capital <code>S</code>).",code:"ls -ld /srv/project"},
+{t:"Add members and test",d:"",code:"usermod -aG devs alice\nsudo -u alice touch /srv/project/test.txt\nls -l /srv/project/test.txt"}]},
+{sc:"Grant user <code>bob</code> read-write access to <code>/data/shared.txt</code> using an ACL, without changing the file's owner or group.",tags:["acl"],check:[["setfacl -m u:bob:rw /data/shared.txt"]],steps:[
+{t:"Modify the ACL",d:"<code>-m</code> modifies an ACL entry. Format: <code>TYPE:NAME:PERMS</code>. Types: <code>u</code> user, <code>g</code> group, <code>o</code> other, <code>m</code> mask. Perms use the usual r/w/x letters.",code:"setfacl -m u:bob:rw /data/shared.txt"},
+{t:"Read current ACLs",d:"",code:"getfacl /data/shared.txt"},
+{t:"Remove a single entry",d:"<code>-x</code> removes by identity (no perms needed).",code:"setfacl -x u:bob /data/shared.txt"},
+{t:"Clear every ACL on the file",d:"",code:"setfacl -b /data/shared.txt"},
+{t:"Default ACL on a directory",d:"A default ACL on a directory is inherited by files created inside it.",code:"setfacl -m d:u:bob:rw /data/shared/"}]}
+]},
+{cat:"Deploy, Configure, Maintain",questions:[
+{sc:"Schedule a one-shot command that restarts <code>httpd</code> 15 minutes from now.",tags:["at"],check:[["at","now + 15","systemctl restart httpd"]],steps:[
+{t:"Make sure atd is running",d:"<code>atd</code> is the daemon that picks up <code>at</code> jobs at their scheduled time.",code:"dnf install -y at\nsystemctl enable --now atd"},
+{t:"Schedule the job",d:"<code>at TIME</code> opens a small prompt where you type the command(s), one per line, and finish with <kbd>Ctrl-D</kbd> (EOT). TIME accepts natural-looking forms: <code>now + 15 minutes</code>, <code>14:30</code>, <code>noon tomorrow</code>.",code:"at now + 15 minutes\nat> systemctl restart httpd\nat> <Ctrl-D>"},
+{t:"One-line variant",d:"Pipe the command into at to avoid the interactive prompt.",code:"echo 'systemctl restart httpd' | at now + 15 minutes"},
+{t:"List, inspect, and cancel jobs",d:"<code>atq</code> lists queued jobs with their IDs. <code>at -c ID</code> shows the contents. <code>atrm ID</code> deletes it.",code:"atq\nat -c 1\natrm 1"}]},
+{sc:"Create a cron job that runs <code>/root/backup.sh</code> every day at 02:30 as root.",tags:["cron"],persist:true,check:[["30 2 * * *","/root/backup.sh"]],steps:[
+{t:"Cron field order",d:"Five fields: <b>minute (0-59) · hour (0-23) · day of month (1-31) · month (1-12) · day of week (0-7, 0 or 7 is Sunday)</b>. Then the command. Use <code>*</code> for any value, <code>*/N</code> for every N, <code>A,B,C</code> for a list, <code>A-B</code> for a range."},
+{t:"Edit the current user's crontab",d:"<code>crontab -e</code> opens your crontab in an editor. Syntax errors are caught on save.",code:"crontab -e\n# Add:\n30 2 * * * /root/backup.sh"},
+{t:"List / delete crontab",d:"",code:"crontab -l\ncrontab -r"},
+{t:"System-level cron in /etc/cron.d/",d:"A drop-in file under <code>/etc/cron.d/</code> has <b>one extra field</b>: the user to run the command as.",code:"echo '30 2 * * * root /root/backup.sh' > /etc/cron.d/backup"},
+{t:"Handy named schedules",d:"Systemd cron understands <code>@reboot</code>, <code>@daily</code>, <code>@hourly</code>, <code>@weekly</code>, <code>@monthly</code>.",code:"@daily /root/backup.sh"}]},
+{sc:"<b>New focus in RHEL 10.</b> Create a systemd timer that runs <code>/root/cleanup.sh</code> every day at 03:00 and recovers missed runs if the host was off.",tags:["timer","systemd","new"],persist:true,check:[["cleanup.timer","oncalendar","03:00","persistent=true","cleanup.service","execstart=/root/cleanup.sh"]],steps:[
+{t:"Why timers instead of cron",d:"Systemd timers integrate with journald, support calendar expressions, monotonic delays (relative to boot), dependency ordering, and the <code>Persistent=true</code> catch-up mechanism. On RHEL 10 they are the recommended scheduling mechanism."},
+{t:"Create the service unit",d:"A timer triggers a <b>service</b>. The service is of type <code>oneshot</code> — it runs, finishes, and is done.",code:"# /etc/systemd/system/cleanup.service\n[Unit]\nDescription=Daily cleanup\n\n[Service]\nType=oneshot\nExecStart=/root/cleanup.sh"},
+{t:"Create the timer unit",d:"The filename before <code>.timer</code> must match the service, or you must name the target with <code>Unit=</code>. <code>OnCalendar</code> defines when. <code>Persistent=true</code> makes the timer run on next boot if the machine was off at the scheduled time.",code:"# /etc/systemd/system/cleanup.timer\n[Unit]\nDescription=Run cleanup daily at 03:00\n\n[Timer]\nOnCalendar=*-*-* 03:00:00\nPersistent=true\nUnit=cleanup.service\n\n[Install]\nWantedBy=timers.target"},
+{t:"Enable and start",d:"<code>systemctl daemon-reload</code> picks up new unit files. Enable the <b>timer</b>, not the service.",code:"systemctl daemon-reload\nsystemctl enable --now cleanup.timer"},
+{t:"Inspect every timer",d:"<code>systemctl list-timers</code> shows the next and last trigger time for each active timer.",code:"systemctl list-timers --all\nsystemctl status cleanup.timer"},
+{t:"OnCalendar shortcuts",d:"<code>daily</code>, <code>weekly</code>, <code>monthly</code>, <code>hourly</code>, or custom patterns like <code>Mon *-*-* 09:00:00</code> (every Monday at 9), <code>*-*-1 04:00</code> (first day of the month at 4)."}]},
+{sc:"Make <code>nfs-server</code> start automatically at boot and right now.",tags:["systemctl"],check:[["systemctl enable --now nfs-server"]],steps:[
+{t:"One command for both",d:"<code>--now</code> adds the start (for enable) or stop (for disable) action.",code:"systemctl enable --now nfs-server"},
+{t:"Verify it will come up at boot",d:"",code:"systemctl is-enabled nfs-server"},
+{t:"Disable and stop",d:"",code:"systemctl disable --now nfs-server"}]},
+{sc:"Make the system boot into multi-user (text) mode by default.",tags:["target","default"],persist:true,check:[["systemctl set-default multi-user.target"]],steps:[
+{t:"Query the current default",d:"",code:"systemctl get-default"},
+{t:"Set a new default",d:"This creates or updates the symlink <code>/etc/systemd/system/default.target</code> pointing to the requested target.",code:"systemctl set-default multi-user.target"},
+{t:"For graphical systems",d:"",code:"systemctl set-default graphical.target"}]},
+{sc:"Configure the system to synchronize its time from NTP server <code>time.example.com</code> via chrony, and set the timezone to <code>Europe/Paris</code>.",tags:["chrony","ntp"],persist:true,check:[["chrony.conf","time.example.com","timedatectl set-timezone europe/paris"],["server time.example.com iburst","timedatectl set-timezone europe/paris"]],steps:[
+{t:"Install chrony",d:"chrony is the default NTP client on RHEL since RHEL 7. Faster and more accurate on systems with intermittent connectivity than the classical ntpd.",code:"dnf install -y chrony"},
+{t:"Edit /etc/chrony.conf",d:"Comment out the default <code>pool</code>/<code>server</code> lines and add your own. <code>iburst</code> tells chrony to send a burst of packets on startup to sync faster.",code:"vim /etc/chrony.conf\n# Replace pool/server lines with:\nserver time.example.com iburst"},
+{t:"Enable and start chronyd",d:"",code:"systemctl enable --now chronyd\nsystemctl restart chronyd"},
+{t:"Check sync status",d:"<code>chronyc sources</code> lists each NTP source and its state. <code>chronyc tracking</code> shows the system's computed offset and drift.",code:"chronyc sources -v\nchronyc tracking\ntimedatectl"},
+{t:"Set the timezone",d:"<code>timedatectl</code> manages both system time and timezone.",code:"timedatectl list-timezones | grep Paris\ntimedatectl set-timezone Europe/Paris"}]},
+{sc:"Change the GRUB boot timeout to 10 seconds and remove <code>quiet</code> from the default kernel command line.",tags:["grub"],persist:true,check:[["grub_timeout=10","grub2-mkconfig","quiet"],["grub_timeout=10","grubby","--remove-args","quiet"]],steps:[
+{t:"Edit /etc/default/grub",d:"This file drives the regeneration of the full GRUB config. Set <code>GRUB_TIMEOUT=10</code> and remove <code>quiet</code> from <code>GRUB_CMDLINE_LINUX</code>.",code:"vim /etc/default/grub"},
+{t:"Regenerate the real GRUB config",d:"The path depends on the firmware: BIOS uses <code>/boot/grub2/grub.cfg</code>, UEFI uses <code>/boot/efi/EFI/redhat/grub.cfg</code>.",code:"# BIOS\ngrub2-mkconfig -o /boot/grub2/grub.cfg\n# UEFI\ngrub2-mkconfig -o /boot/efi/EFI/redhat/grub.cfg"},
+{t:"Quick one-off arg changes with grubby",d:"<code>grubby</code> modifies the kernel args of individual entries without regenerating everything. <code>--update-kernel=ALL</code> targets every installed kernel.",code:"grubby --update-kernel=ALL --remove-args=\"quiet\"\ngrubby --update-kernel=ALL --args=\"console=tty0\""},
+{t:"Check what GRUB will use",d:"",code:"grubby --info=DEFAULT"}]}
+]},
+{cat:"Networking",questions:[
+{sc:"Configure static IPv4 on interface <code>ens160</code>: address <code>192.168.10.50/24</code>, gateway <code>192.168.10.1</code>, DNS <code>8.8.8.8</code>.",tags:["nmcli","ipv4"],persist:true,check:[["nmcli con mod","ens160","ipv4.addresses 192.168.10.50/24","ipv4.gateway 192.168.10.1","ipv4.dns 8.8.8.8","ipv4.method manual"]],steps:[
+{t:"List connections and devices",d:"<code>nmcli con</code> (connections = profiles) vs <code>nmcli dev</code> (actual hardware). A profile must be <i>activated</i> on a device.",code:"nmcli con show\nnmcli dev status\nip a"},
+{t:"Modify the connection profile",d:"<code>nmcli con mod CONN PROP VALUE ...</code> changes properties without activating. Property names follow dotted paths: <code>ipv4.addresses</code>, <code>ipv4.gateway</code>, <code>ipv4.dns</code>, <code>ipv4.method</code> (<code>auto</code>=DHCP or <code>manual</code>=static).",code:"nmcli con mod ens160 \\\n  ipv4.addresses 192.168.10.50/24 \\\n  ipv4.gateway 192.168.10.1 \\\n  ipv4.dns 8.8.8.8 \\\n  ipv4.method manual"},
+{t:"Reactivate to apply",d:"Changes made with <code>mod</code> are saved but only applied after the connection is brought back up.",code:"nmcli con down ens160\nnmcli con up ens160"},
+{t:"Verify",d:"",code:"ip a show ens160\nip route\ncat /etc/resolv.conf"},
+{t:"Create a fresh connection profile",d:"<code>add type ethernet con-name NAME ifname DEV</code> creates a new profile bound to a device.",code:"nmcli con add type ethernet con-name static-ens160 ifname ens160 \\\n  ip4 192.168.10.50/24 gw4 192.168.10.1"}]},
+{sc:"Add a static IPv6 address <code>2001:db8::50/64</code> on <code>ens160</code> with gateway <code>2001:db8::1</code>.",tags:["nmcli","ipv6"],persist:true,check:[["nmcli con mod","ens160","ipv6.addresses 2001:db8::50/64","ipv6.gateway 2001:db8::1","ipv6.method manual"]],steps:[
+{t:"Modify the profile",d:"IPv6 properties live under the <code>ipv6.</code> prefix: <code>ipv6.addresses</code>, <code>ipv6.gateway</code>, <code>ipv6.method</code>. <code>manual</code> = static, <code>auto</code> = SLAAC, <code>ignore</code> = off.",code:"nmcli con mod ens160 \\\n  ipv6.addresses 2001:db8::50/64 \\\n  ipv6.gateway 2001:db8::1 \\\n  ipv6.method manual"},
+{t:"Reactivate and verify",d:"",code:"nmcli con down ens160 && nmcli con up ens160\nip -6 a show ens160\nip -6 route"}]},
+{sc:"Make <code>servera.example.com</code> resolve to <code>192.168.10.20</code> via a local static entry.",tags:["hosts","dns"],persist:true,check:[["192.168.10.20","servera.example.com","/etc/hosts"],["192.168.10.20 servera.example.com"]],steps:[
+{t:"Edit /etc/hosts",d:"Format: <b>IP  FQDN  [aliases...]</b>. Lookups in <code>/etc/hosts</code> are tried before DNS by default (order is set in <code>/etc/nsswitch.conf</code>).",code:"vim /etc/hosts\n# add:\n192.168.10.20  servera.example.com  servera"},
+{t:"Verify resolution",d:"<code>getent hosts</code> follows nsswitch order exactly.",code:"getent hosts servera.example.com\nping -c 2 servera"},
+{t:"Add an extra DNS server to an existing profile",d:"<code>+ipv4.dns</code> appends without replacing existing entries.",code:"nmcli con mod ens160 +ipv4.dns 1.1.1.1\nnmcli con up ens160"}]},
+{sc:"Set the permanent hostname of the machine to <code>web01.example.com</code>.",tags:["hostname"],persist:true,check:[["hostnamectl set-hostname web01.example.com"]],steps:[
+{t:"Set it with hostnamectl",d:"<code>hostnamectl set-hostname</code> updates <code>/etc/hostname</code> and notifies systemd. The change survives reboots.",code:"hostnamectl set-hostname web01.example.com"},
+{t:"Confirm",d:"",code:"hostnamectl\nhostname"},
+{t:"Keep /etc/hosts in sync",d:"Many services resolve their own hostname at startup. An entry in <code>/etc/hosts</code> prevents delays if DNS is unavailable.",code:"echo '127.0.1.1 web01.example.com web01' >> /etc/hosts"}]}
+]},
+{cat:"Users and Groups",questions:[
+{sc:"Create user <code>alice</code> with UID <code>1500</code>, bash shell, home directory <code>/home/alice</code>, and comment <code>Alice Dupont</code>. Then delete user <code>bob</code> along with his home directory.",tags:["useradd"],check:[["useradd","-u 1500","alice","-m","userdel -r bob"]],steps:[
+{t:"Create with specific attributes",d:"<code>-u UID</code>, <code>-s SHELL</code>, <code>-d HOMEDIR</code>, <code>-m</code> creates the home directory, <code>-c COMMENT</code> fills the GECOS field (often used for full name), <code>-G GROUP1,GROUP2</code> adds to supplementary groups.",code:"useradd -u 1500 -s /bin/bash -d /home/alice -m -c \"Alice Dupont\" alice"},
+{t:"Set or reset a password",d:"Interactively, <code>passwd USER</code> prompts twice. Non-interactively (useful for scripts), pipe into <code>passwd --stdin</code>.",code:"passwd alice\necho 'Password123' | passwd --stdin alice"},
+{t:"Modify an existing user",d:"<code>usermod</code> uses most of the same flags as <code>useradd</code>. Be careful: <code>usermod -G</code> <b>replaces</b> the supplementary groups — use <code>-aG</code> (append) to add without losing existing memberships.",code:"usermod -s /bin/zsh alice\nusermod -L alice   # lock account (disables password)\nusermod -U alice   # unlock"},
+{t:"Delete users",d:"<code>userdel USER</code> removes the account but keeps the home directory. <code>userdel -r USER</code> removes the home directory and mail spool too.",code:"userdel -r bob"}]},
+{sc:"Configure password aging for <code>alice</code>: maximum 60 days, warning 7 days before expiry, minimum 1 day between changes.",tags:["chage"],check:[["chage","-m 60","-w 7","-m 1","alice"]],steps:[
+{t:"Inspect the current policy",d:"<code>chage -l USER</code> prints every aging field in readable form.",code:"chage -l alice"},
+{t:"Set the limits",d:"<code>-M N</code>: max days a password stays valid. <code>-m N</code>: min days between password changes (0 = no restriction). <code>-W N</code>: number of days the user is warned before expiration. <code>-E YYYY-MM-DD</code>: absolute account expiration date.",code:"chage -M 60 -W 7 -m 1 alice"},
+{t:"Force a password change at next login",d:"<code>-d 0</code> sets the last-change date to epoch (1970-01-01), which makes the password immediately expired.",code:"chage -d 0 alice"},
+{t:"Verify",d:"",code:"chage -l alice"}]},
+{sc:"Create group <code>devs</code> with GID <code>2000</code>, then add <code>alice</code> and <code>bob</code> to it without disturbing their existing group memberships.",tags:["group","usermod"],check:[["groupadd -g 2000 devs","usermod -ag devs alice","usermod -ag devs bob"]],steps:[
+{t:"Create the group",d:"<code>-g GID</code> pins the numeric GID.",code:"groupadd -g 2000 devs"},
+{t:"Add users — the -a flag is critical",d:"<code>usermod -G devs alice</code> <b>replaces</b> alice's supplementary groups with just <code>devs</code>. <code>usermod -aG devs alice</code> (append) adds without losing anything. This is one of the most common exam pitfalls.",code:"usermod -aG devs alice\nusermod -aG devs bob"},
+{t:"Set the primary group of a user",d:"The primary group is the one associated with files the user creates. It's also usually the gid field in <code>/etc/passwd</code>.",code:"usermod -g devs alice"},
+{t:"Check membership",d:"",code:"id alice\ngetent group devs"},
+{t:"Remove a user from a group",d:"",code:"gpasswd -d alice devs"}]},
+{sc:"Grant <code>alice</code> full sudo access without password prompting, and grant the group <code>ops</code> permission to restart services with no password.",tags:["sudo"],persist:true,check:[["alice all=(all) nopasswd: all","%ops","nopasswd","systemctl"]],steps:[
+{t:"Prefer drop-in files under /etc/sudoers.d/",d:"Each file defines rules scoped to specific users or groups. Easier to manage than one huge <code>/etc/sudoers</code> file.",code:"vim /etc/sudoers.d/alice"},
+{t:"Contents for alice: full sudo, no password",d:"Syntax: <b>WHO HOST=(RUNAS) TAG: COMMANDS</b>. <code>NOPASSWD:</code> skips the password prompt.",code:"alice ALL=(ALL) NOPASSWD: ALL"},
+{t:"Always edit sudoers files with visudo",d:"<code>visudo</code> validates the syntax on save — a broken sudoers lets nobody gain privileges.",code:"visudo -f /etc/sudoers.d/alice"},
+{t:"Shortcut: add user to the wheel group",d:"The default <code>/etc/sudoers</code> grants full sudo to <code>wheel</code>. Uncomment the NOPASSWD line there to disable the prompt.",code:"usermod -aG wheel alice"},
+{t:"Restrict a group to specific commands",d:"The <code>%</code> prefix identifies a group. List commands with absolute paths.",code:"# /etc/sudoers.d/ops\n%ops ALL=(root) NOPASSWD: /usr/bin/systemctl restart *, /usr/bin/systemctl status *"},
+{t:"Strict permissions are mandatory",d:"sudo refuses to read a sudoers file with permissions other than 0440.",code:"chmod 440 /etc/sudoers.d/alice /etc/sudoers.d/ops"}]},
+{sc:"Lock the account of user <code>bob</code> and schedule expiration on 2026-12-31.",tags:["usermod","lock"],check:[["usermod -l bob","chage -e 2026-12-31 bob"]],steps:[
+{t:"Lock the account",d:"<code>usermod -L</code> prepends a <code>!</code> to the password hash in <code>/etc/shadow</code>, making it impossible to match any password. Unlock with <code>-U</code>. Alternative: <code>passwd -l</code> / <code>passwd -u</code>.",code:"usermod -L bob"},
+{t:"Set an expiration date",d:"After that date, the account is disabled regardless of the password state.",code:"chage -E 2026-12-31 bob"},
+{t:"Verify",d:"",code:"chage -l bob\npasswd -S bob"}]}
+]},
+{cat:"Security",questions:[
+{sc:"Permanently allow the <code>http</code> and <code>https</code> services through firewalld in the default zone.",tags:["firewalld","service"],persist:true,check:[["firewall-cmd --add-service=http --permanent","firewall-cmd --add-service=https --permanent","firewall-cmd --reload"]],steps:[
+{t:"Inspect the current state",d:"<code>--get-default-zone</code> tells you which zone is active. <code>--list-all</code> dumps every rule of that zone.",code:"firewall-cmd --get-default-zone\nfirewall-cmd --list-all"},
+{t:"Add the services permanently",d:"<code>--permanent</code> writes the rule to the on-disk config (<code>/etc/firewalld/zones/</code>). Without it, the change is runtime-only and is lost after a reload or reboot.",code:"firewall-cmd --add-service=http --permanent\nfirewall-cmd --add-service=https --permanent"},
+{t:"Apply the permanent config to the running firewall",d:"<code>--reload</code> rereads the on-disk config, replacing the current runtime rules.",code:"firewall-cmd --reload"},
+{t:"Verify",d:"",code:"firewall-cmd --list-services"},
+{t:"Where the names come from",d:"Each service name corresponds to a file in <code>/usr/lib/firewalld/services/</code>. To list all: <code>firewall-cmd --get-services</code>."}]},
+{sc:"Permanently open TCP port <code>8080</code> and UDP port <code>53</code>.",tags:["firewalld","port"],persist:true,check:[["--add-port=8080/tcp","--add-port=53/udp","--permanent","firewall-cmd --reload"]],steps:[
+{t:"Add individual ports",d:"",code:"firewall-cmd --add-port=8080/tcp --permanent\nfirewall-cmd --add-port=53/udp --permanent"},
+{t:"Add a range of ports",d:"",code:"firewall-cmd --add-port=10000-11000/tcp --permanent"},
+{t:"Reload and verify",d:"",code:"firewall-cmd --reload\nfirewall-cmd --list-ports"}]},
+{sc:"Allow SSH only from the <code>192.168.10.0/24</code> network; reject SSH from everywhere else.",tags:["firewalld","rich-rule"],persist:true,check:[["rich-rule","192.168.10.0/24","ssh","accept","--permanent"]],steps:[
+{t:"Rich rules in one line",d:"Rich rules express everything: source, destination, protocol, port, service, action. Syntax uses quoted key=value pairs.",code:"firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"192.168.10.0/24\" service name=\"ssh\" accept'"},
+{t:"Reject from a specific host",d:"<code>reject</code> sends an ICMP rejection back; <code>drop</code> silently discards.",code:"firewall-cmd --permanent --add-rich-rule='rule family=\"ipv4\" source address=\"10.0.0.5\" service name=\"ssh\" reject'"},
+{t:"Apply and list",d:"",code:"firewall-cmd --reload\nfirewall-cmd --list-rich-rules"}]},
+{sc:"Set the default umask for every user to <code>027</code> system-wide.",tags:["umask"],persist:true,check:[["umask 027","/etc/profile"],["umask 027","/etc/bashrc"]],steps:[
+{t:"What umask does",d:"The umask is <b>subtracted</b> from the default creation mode: 666 for files, 777 for directories. So umask <code>027</code> gives new files mode 640 and new directories mode 750 — group read-only, no access for others."},
+{t:"See current value",d:"",code:"umask"},
+{t:"Set for the current session",d:"",code:"umask 027"},
+{t:"Persist system-wide",d:"A line in <code>/etc/profile</code> or <code>/etc/bashrc</code> is applied for every login shell.",code:"echo 'umask 027' >> /etc/profile"},
+{t:"Persist for a single user",d:"",code:"echo 'umask 027' >> /home/alice/.bashrc"},
+{t:"Test",d:"",code:"umask 027\ntouch /tmp/mask_test\nls -l /tmp/mask_test"}]},
+{sc:"Generate a key pair on your workstation, copy the public key to <code>servera</code> for user <code>alice</code>, then disable password authentication on the server.",tags:["ssh","key"],persist:true,check:[["ssh-keygen","ssh-copy-id","alice","passwordauthentication no"]],steps:[
+{t:"Generate a key pair",d:"<code>-t TYPE</code> picks the algorithm. <code>ed25519</code> is small, fast and modern. <code>-f FILE</code> saves it elsewhere. <code>-N ''</code> sets no passphrase (use a passphrase in real life).",code:"ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N ''"},
+{t:"Copy the public key to the server",d:"<code>ssh-copy-id</code> appends the local public key to the remote <code>~/.ssh/authorized_keys</code>, creating the directory with the right permissions if needed.",code:"ssh-copy-id alice@servera"},
+{t:"Manual copy if ssh-copy-id is unavailable",d:"Sensitive part: permissions must be <code>700</code> on <code>~/.ssh</code> and <code>600</code> on <code>authorized_keys</code>; otherwise sshd refuses to use them.",code:"cat ~/.ssh/id_ed25519.pub | ssh alice@servera \\\n  'mkdir -p ~/.ssh && chmod 700 ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys'"},
+{t:"Test: the server should not ask for a password anymore",d:"",code:"ssh alice@servera"},
+{t:"Disable password auth on the server",d:"Edit <code>/etc/ssh/sshd_config</code>:",code:"PasswordAuthentication no\nPubkeyAuthentication yes"},
+{t:"Reload sshd",d:"",code:"systemctl reload sshd"}]},
+{sc:"Check the current SELinux mode, switch it to permissive for this boot, then make enforcing the permanent default.",tags:["selinux","mode"],persist:true,check:[["getenforce","setenforce 0","selinux=enforcing"]],steps:[
+{t:"Query the current state",d:"<code>getenforce</code> returns a single word. <code>sestatus</code> is more verbose (mount points, policy, etc.).",code:"getenforce\nsestatus"},
+{t:"Temporary switch with setenforce",d:"<code>setenforce 0</code> = permissive, <code>setenforce 1</code> = enforcing. Change is <b>lost at reboot</b>. Cannot switch to <code>disabled</code> at runtime.",code:"setenforce 0"},
+{t:"Permanent change via /etc/selinux/config",d:"Edit and set <code>SELINUX=enforcing</code>. Valid values: <code>enforcing</code>, <code>permissive</code>, <code>disabled</code>. Any change that flips to/from <code>disabled</code> requires a reboot and usually a relabel.",code:"vim /etc/selinux/config\n# set: SELINUX=enforcing"},
+{t:"Reboot and verify",d:"Always finish an exam with SELinux in <b>enforcing</b> mode — many tasks are auto-graded against that.",code:"reboot\n# after boot:\nsestatus"}]},
+{sc:"Show the SELinux context of every file in <code>/var/www/html</code> and of the <code>httpd</code> process.",tags:["selinux","context"],check:[["ls -z","/var/www/html","-z","httpd"]],steps:[
+{t:"Context anatomy",d:"A context looks like <code>user:role:type:level</code>. The <b>type</b> (e.g. <code>httpd_sys_content_t</code>) is what matters 95% of the time — policies are written against types."},
+{t:"File or directory context",d:"<code>-Z</code> adds the SELinux context column to most coreutils tools.",code:"ls -Z /var/www/html\nls -ldZ /var/www"},
+{t:"Process context",d:"",code:"ps -eZ | grep httpd\nps axZ"},
+{t:"Current shell context",d:"",code:"id -Z"},
+{t:"Port context",d:"",code:"semanage port -l | grep http"}]},
+{sc:"You copied files from <code>/root</code> into <code>/var/www/html</code> and httpd no longer serves them. Restore the default SELinux context.",tags:["selinux","restorecon"],check:[["restorecon","-r","/var/www/html"]],steps:[
+{t:"Why cp breaks labels",d:"<code>cp</code> uses the <b>default type for the parent directory</b> instead of copying the source label. <code>mv</code> preserves labels because it's just a rename on the same filesystem. Use <code>cp -Z</code> or <code>cp --preserve=context</code> if you want cp to keep the original label."},
+{t:"Confirm the problem",d:"Files should have <code>httpd_sys_content_t</code>; after a naive cp they may carry <code>admin_home_t</code>.",code:"ls -Z /var/www/html"},
+{t:"Restore the default context recursively",d:"<code>restorecon</code> reapplies labels based on the system policy (default file contexts database). <code>-R</code> recurses, <code>-v</code> is verbose.",code:"restorecon -Rv /var/www/html"},
+{t:"Force a full relabel at next boot",d:"A sledgehammer, useful when many files are mislabeled.",code:"touch /.autorelabel\nreboot"}]},
+{sc:"You want to serve a website from <code>/srv/www/html</code> instead of <code>/var/www/html</code>. Make SELinux allow httpd to read this new location.",tags:["selinux","fcontext"],persist:true,check:[["semanage fcontext -a -t httpd_sys_content_t","/srv/www","restorecon","-r","/srv/www"]],steps:[
+{t:"Check the type expected by httpd",d:"This is <code>httpd_sys_content_t</code>.",code:"ls -dZ /var/www/html"},
+{t:"Add a new fcontext rule",d:"<code>semanage fcontext -a -t TYPE REGEX</code> tells the policy: every path matching REGEX should be labeled TYPE. The regex <code>\"(/.*)?\"</code> matches both the directory itself and everything under it.",code:"semanage fcontext -a -t httpd_sys_content_t \"/srv/www(/.*)?\""},
+{t:"Apply the rule to existing files",d:"<code>semanage fcontext</code> only registers the rule; <code>restorecon</code> is what actually changes labels on disk.",code:"restorecon -Rv /srv/www"},
+{t:"Verify",d:"",code:"ls -RZ /srv/www\nsemanage fcontext -l | grep srv/www"},
+{t:"Remove a custom fcontext rule",d:"",code:"semanage fcontext -d \"/srv/www(/.*)?\"\nrestorecon -Rv /srv/www"}]},
+{sc:"Allow <code>httpd</code> to listen on TCP port <code>8080</code> as far as SELinux is concerned.",tags:["selinux","port"],persist:true,check:[["semanage port -a -t http_port_t -p tcp 8080"]],steps:[
+{t:"Why this is needed",d:"SELinux restricts which ports a service type may bind. By default, httpd may bind only on ports labeled <code>http_port_t</code> (80, 443, 8008, 8009...). Trying another port returns a cryptic 'permission denied' in the logs."},
+{t:"List current allowed ports",d:"",code:"semanage port -l | grep http"},
+{t:"Add a port to a type",d:"<code>-a</code> adds, <code>-t TYPE</code> names the target type, <code>-p PROTO PORT</code> the protocol/port.",code:"semanage port -a -t http_port_t -p tcp 8080"},
+{t:"Modify if the port is already mapped elsewhere",d:"<code>-m</code> modifies. Use it when <code>-a</code> complains that the port is already defined.",code:"semanage port -m -t http_port_t -p tcp 8080"},
+{t:"Don't forget the firewall too",d:"SELinux and firewalld are two different layers — both must allow the port.",code:"firewall-cmd --add-port=8080/tcp --permanent\nfirewall-cmd --reload"}]},
+{sc:"Allow httpd to connect to remote network services and to read user home directories persistently.",tags:["selinux","boolean"],persist:true,check:[["setsebool -p httpd_can_network_connect on","setsebool -p httpd_enable_homedirs on"]],steps:[
+{t:"SELinux booleans",d:"Booleans are on/off switches baked into the policy. They let you toggle common use-cases without writing new rules. They are discovered by module — for httpd there are dozens."},
+{t:"List booleans related to a subject",d:"",code:"getsebool -a | grep httpd\nsemanage boolean -l | grep httpd"},
+{t:"Toggle a boolean persistently",d:"<code>-P</code> (persistent) writes to the policy store so the value survives reboots. <b>Without <code>-P</code>, the change is lost at reboot</b> — this is the most common exam mistake.",code:"setsebool -P httpd_can_network_connect on\nsetsebool -P httpd_enable_homedirs on"},
+{t:"Verify",d:"",code:"getsebool httpd_can_network_connect httpd_enable_homedirs"}]},
+{sc:"You suspect SELinux is blocking a service. Find the recent denials and read the human-readable explanations.",tags:["selinux","audit"],check:[["ausearch","avc","sealert"]],steps:[
+{t:"Install troubleshooting tools",d:"<code>setroubleshoot</code> provides <code>sealert</code>, which analyses the audit log and suggests fixes in plain English.",code:"dnf install -y setroubleshoot-server policycoreutils-python-utils"},
+{t:"Fast query of denials",d:"<code>ausearch</code> queries the audit log. <code>-m AVC</code> filters Access Vector Cache messages — the denials. <code>-ts today</code> limits to today.",code:"ausearch -m AVC -ts recent\nausearch -m AVC -ts today"},
+{t:"Human-readable analysis",d:"<code>sealert</code> groups similar denials together and often proposes the exact command to fix them (<code>restorecon</code>, <code>setsebool</code>, <code>semanage</code>).",code:"sealert -a /var/log/audit/audit.log"},
+{t:"Follow in the journal",d:"Alternative view using journald.",code:"journalctl -t setroubleshoot"}]},
+{sc:"Disable direct SSH login as <code>root</code> on the server.",tags:["ssh","security"],persist:true,check:[["permitrootlogin no","systemctl reload sshd"],["permitrootlogin no","systemctl restart sshd"]],steps:[
+{t:"Edit /etc/ssh/sshd_config",d:"Find the <code>PermitRootLogin</code> line (there may be a comment) and set it to <code>no</code>. Accepted values: <code>yes</code>, <code>no</code>, <code>prohibit-password</code> (keys only).",code:"vim /etc/ssh/sshd_config\n# set:  PermitRootLogin no"},
+{t:"Reload sshd to apply",d:"",code:"systemctl reload sshd"},
+{t:"Verify",d:"Use a throwaway session, keeping the current one open in case something is wrong.",code:"ssh root@localhost   # should be refused"}]},
+{sc:"Create <code>/data/public</code> such that any user can write files in it, but only the <b>owner</b> of a file can delete or rename it (think: <code>/tmp</code>).",tags:["sticky","permissions"],persist:true,check:[["chmod 1777 /data/public"],["chmod 777 /data/public","chmod +t /data/public"]],steps:[
+{t:"What the sticky bit does",d:"On a directory that is world-writable, the sticky bit restricts the deletion or renaming of files to the file owner, the directory owner, or root. Without it, anyone with write access could remove anyone's file. <code>/tmp</code> is the canonical example."},
+{t:"Apply with octal",d:"Leading digit <b>1</b> = sticky. So <code>1777</code> = sticky + rwx for everyone.",code:"mkdir -p /data/public\nchmod 1777 /data/public"},
+{t:"Apply symbolically",d:"",code:"chmod +t /data/public"},
+{t:"Verify",d:"The <code>t</code> in the <code>other</code>-execute slot indicates sticky is set.",code:"ls -ld /data/public\n# drwxrwxrwt ..."}]}
+]}
+];
+
+const root = document.getElementById('questions');
+const nav = document.getElementById('nav');
+function escHtml(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function slug(s){return s.toLowerCase().replace(/[^\w]+/g,'-').replace(/^-|-$/g,'');}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+// --- FILE EDITOR EXTENSIONS: attach a second "file content" panel to selected scenarios ---
+const FILE_EXT = [
+  {match:'hello</code> on the first line',
+   shellCheck:[['vim /tmp/note.txt'],['vi /tmp/note.txt'],['nano /tmp/note.txt']],
+   file:{path:'/tmp/note.txt', check:[['hello']]}},
+  {match:'local BaseOS repository',
+   shellCheck:[['/etc/yum.repos.d/','dnf repolist']],
+   file:{path:'/etc/yum.repos.d/local.repo', check:[['baseurl=http://content.example.com/rhel10/baseos','enabled=1']]}},
+  {match:'takes a path as its first argument',
+   shellCheck:[['chmod +x','/root/check.sh'],['bash /root/check.sh']],
+   file:{path:'/root/check.sh', check:[['#!/bin/bash','if','-f','-d','$1','fi']]}},
+  {match:'creates 10 local users',
+   shellCheck:[['bash /root/'],['chmod +x','/root/'],['sh /root/']],
+   file:{path:'/root/create-users.sh', check:[['#!/bin/bash','for','useradd']]}},
+  {match:'prints its own name, the number of arguments',
+   shellCheck:[['bash /root/'],['chmod +x','/root/'],['sh /root/']],
+   file:{path:'/root/args.sh', check:[['#!/bin/bash','$0','$#','$@']]}},
+  {match:'counts the users whose login shell is',
+   shellCheck:[['bash /root/'],['chmod +x','/root/'],['sh /root/']],
+   file:{path:'/root/count-bash.sh', check:[['#!/bin/bash','$(','grep','/bin/bash','/etc/passwd']]}},
+  {match:'exits with code 1 if it is not run as root',
+   shellCheck:[['bash /root/'],['chmod +x','/root/'],['sh /root/']],
+   file:{path:'/root/guard.sh', check:[['#!/bin/bash','exit 1','exit 2']]}},
+  {match:'systemd timer that runs',
+   shellCheck:[['systemctl daemon-reload','systemctl enable --now cleanup.timer']],
+   file:{path:'/etc/systemd/system/cleanup.timer', check:[['[timer]','oncalendar','03:00','persistent=true']]}},
+  {match:'synchronize its time from NTP server',
+   shellCheck:[['systemctl restart chronyd','timedatectl set-timezone europe/paris']],
+   file:{path:'/etc/chrony.conf', check:[['server time.example.com','iburst']]}},
+  {match:'GRUB boot timeout to 10 seconds',
+   shellCheck:[['grub2-mkconfig','quiet'],['grubby','--remove-args','quiet','grub_timeout']],
+   file:{path:'/etc/default/grub', check:[['grub_timeout=10']]}},
+  {match:'Make <code>servera.example.com</code> resolve',
+   shellCheck:[['getent hosts','servera'],['ping','servera']],
+   file:{path:'/etc/hosts', check:[['192.168.10.20','servera.example.com']]}},
+  {match:'full sudo access without password',
+   shellCheck:[['visudo','/etc/sudoers.d/'],['chmod 440','/etc/sudoers.d/'],['/etc/sudoers.d/alice']],
+   file:{path:'/etc/sudoers.d/alice', check:[['alice all=(all) nopasswd: all']]}},
+  {match:'default umask for every user to',
+   shellCheck:[['/etc/profile'],['/etc/bashrc']],
+   file:{path:'/etc/profile', check:[['umask 027']]}},
+  {match:'Generate a key pair on your workstation',
+   shellCheck:[['ssh-keygen','ssh-copy-id','alice','systemctl reload sshd']],
+   file:{path:'/etc/ssh/sshd_config', check:[['passwordauthentication no']]}},
+  {match:'Check the current SELinux mode, switch',
+   shellCheck:[['getenforce','setenforce 0']],
+   file:{path:'/etc/selinux/config', check:[['selinux=enforcing']]}},
+  {match:'Disable direct SSH login as <code>root</code>',
+   shellCheck:[['systemctl reload sshd'],['systemctl restart sshd']],
+   file:{path:'/etc/ssh/sshd_config', check:[['permitrootlogin no']]}},
+];
+// Apply extensions: find the scenario by unique substring, attach .file, override .check
+DATA.forEach(c => c.questions.forEach(q => {
+  for(const ext of FILE_EXT){
+    if(q.sc.includes(ext.match)){
+      q.file = ext.file;
+      if(ext.shellCheck) q.check = ext.shellCheck;
+      break;
+    }
+  }
+}));
+// Assign stable catalog IDs BEFORE shuffling — #12 is always the same task
+let __sid = 0;
+DATA.forEach(c => c.questions.forEach(q => { __sid++; q.stableId = __sid; q.qid = 'q-' + __sid; }));
+// Shuffle within each category on every load
+DATA.forEach(c => shuffle(c.questions));
+let totalQ = 0;
+DATA.forEach((cat, ci)=>{
+  const catId = 'cat-' + slug(cat.cat);
+  const catNum = String(ci+1).padStart(2,'0');
+  const ch = document.createElement('div');
+  ch.className = 'cat-header';
+  ch.id = catId;
+  ch.innerHTML = `<span class="cat-num">${catNum}</span><h2>${cat.cat}</h2><span class="cat-count">${cat.questions.length} tasks</span>`;
+  root.appendChild(ch);
+  const navSection = document.createElement('div');
+  navSection.className = 'nav-section';
+  const navCat = document.createElement('div');
+  navCat.className = 'nav-cat';
+  navCat.innerHTML = `<span><span class="nav-cat-num">${catNum}</span>${cat.cat}</span><span class="count" data-cat-total="${cat.questions.length}">${cat.questions.length}</span><div class="nav-cat-progress"><div class="nav-cat-progress-bar" data-cat="${slug(cat.cat)}" style="width:0%"></div></div>`;
+  navSection.appendChild(navCat);
+  const navItems = document.createElement('div');
+  navItems.className = 'nav-items';
+  cat.questions.forEach((q)=>{
+    totalQ++;
+    const qid = q.qid;
+    const num = String(q.stableId).padStart(2,'0');
+    const tagsHtml = (q.tags||[]).map(t=>{
+      const cls = t==='new' ? 'tag new' : (t==='critical' ? 'tag critical' : 'tag');
+      const label = t==='new' ? 'new in RHEL 10' : (t==='critical' ? 'critical' : t);
+      return `<span class="${cls}">${label}</span>`;
+    }).join('');
+    let stepsHtml = '';
+    (q.steps||[]).forEach((s, si)=>{
+      stepsHtml += `<div class="step">
+        <div class="step-title"><span class="step-num">${si+1}</span>${s.t||''}</div>
+        ${s.d?`<div class="step-desc">${s.d}</div>`:''}
+        ${s.code?`<pre><button class="copy-btn">Copy</button><code>${escHtml(s.code)}</code></pre>`:''}
+      </div>`;
+    });
+    let extrasHtml = '';
+    if(q.persist){
+      extrasHtml += `<div class="persist"><b>Persist across reboots.</b> After editing a config file or unit, reboot once and verify the setting is still effective.</div>`;
+    }
+    const card = document.createElement('div');
+    card.className = 'question';
+    card.id = qid;
+    card.dataset.search = (q.sc + ' ' + (q.tags||[]).join(' ')).toLowerCase();
+    card.dataset.check = JSON.stringify(q.check || []);
+    if(q.file){ card.dataset.fileCheck = JSON.stringify(q.file.check || []); card.dataset.filePath = q.file.path; }
+    const fileBlock = q.file ? `
+        <div class="file-editor-wrap">
+          <div class="terminal-label dual-label"><span>File contents</span><span class="pill">Tab to indent · Ctrl+Enter to validate</span></div>
+          <div class="terminal file-editor">
+            <div class="term-bar">
+              <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+              <span class="term-title"><svg class="file-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span class="file-path">${q.file.path}</span></span>
+            </div>
+            <div class="term-body file-body">
+              <div class="file-linenumbers" aria-hidden="true">1</div>
+              <textarea class="file-input" rows="4" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="type the file contents here..."></textarea>
+            </div>
+          </div>
+        </div>` : '';
+    const shellLabel = q.file ? 'Shell commands' : 'Your answer';
+    card.innerHTML = `
+      <div class="q-header">
+        <span class="q-num">#${num}</span>
+        <div class="q-title-wrap">
+          <div class="q-scenario-title">${q.sc}</div>
+          <div class="q-tags">${tagsHtml}</div>
+        </div>
+        <div class="q-check" data-id="${qid}" title="Mark as done"></div>
+      </div>
+      <div class="q-body">
+        <div class="terminal-wrap">
+          <div class="terminal-label"><span>${shellLabel}</span><span>Enter to validate · Shift+Enter newline · ↑↓ history</span></div>
+          <div class="terminal">
+            <div class="term-bar">
+              <span class="term-dot r"></span><span class="term-dot y"></span><span class="term-dot g"></span>
+              <span class="term-title">bash &mdash; practice</span>
+            </div>
+            <div class="term-body">
+              <span class="term-prompt">[<span class="host">student@servera</span> <span class="sep">~</span>]$&nbsp;</span>
+              <textarea class="term-input" rows="2" spellcheck="false" autocomplete="off" autocorrect="off" autocapitalize="off" placeholder="type your command here..."></textarea>
+            </div>
+          </div>
+        </div>
+        ${fileBlock}
+        <div class="q-actions">
+          <button class="btn btn-primary btn-validate">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+            Validate
+          </button>
+          <button class="btn btn-ghost btn-show">Show solution</button>
+          <button class="btn btn-link btn-skip">Skip and mark as done</button>
+        </div>
+        <div class="q-feedback"></div>
+        <div class="q-solution">
+          <div class="solution-label">Step-by-step solution</div>
+          <div class="steps">${stepsHtml}</div>
+          ${extrasHtml}
+        </div>
+      </div>
+    `;
+    root.appendChild(card);
+    const a = document.createElement('a');
+    a.className = 'nav-link';
+    a.href = '#' + qid;
+    a.dataset.qid = qid;
+    const shortTitle = q.sc.replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
+    const nicer = shortTitle.length > 80 ? shortTitle.slice(0,78).trim() + '...' : shortTitle;
+    a.innerHTML = `<span class="num">${num}</span><span class="lbl">${nicer}</span><span class="check"></span>`;
+    navItems.appendChild(a);
+  });
+  navSection.appendChild(navItems);
+  nav.appendChild(navSection);
+  navCat.addEventListener('click', ()=> navItems.classList.toggle('collapsed'));
+});
+document.getElementById('progTotal').textContent = totalQ;
+
+function normalize(s){ return s.toLowerCase().replace(/\s+/g,' ').trim(); }
+function checkAnswer(input, patterns){
+  if(!patterns || !patterns.length) return true;
+  const norm = normalize(input);
+  if(!norm) return false;
+  return patterns.some(tokens =>
+    tokens.every(tok => norm.includes(tok.toLowerCase()))
+  );
+}
+// Return {ok, found, missing} using the pattern closest to the user's answer
+function analyzeAnswer(input, patterns){
+  if(!patterns || !patterns.length) return {ok:true, found:[], missing:[]};
+  const norm = normalize(input);
+  if(!norm) return {ok:false, found:[], missing: patterns[0] || []};
+  let best = null;
+  for(const tokens of patterns){
+    const found = tokens.filter(t => norm.includes(t.toLowerCase()));
+    const missing = tokens.filter(t => !norm.includes(t.toLowerCase()));
+    if(missing.length === 0){
+      return {ok:true, found, missing:[]};
+    }
+    if(!best || found.length > best.found.length){
+      best = {found, missing};
+    }
+  }
+  return {ok:false, found:best.found, missing:best.missing};
+}
+function renderTokens(tokens, cls){
+  return tokens.map(t => `<code class="token-chip ${cls}">${escHtml(t)}</code>`).join('');
+}
+
+document.addEventListener('click', e=>{
+  if(e.target.classList.contains('copy-btn')){
+    const code = e.target.parentElement.querySelector('code').textContent;
+    navigator.clipboard.writeText(code).then(()=>{
+      e.target.textContent = 'Copied';
+      e.target.classList.add('copied');
+      setTimeout(()=>{e.target.textContent='Copy';e.target.classList.remove('copied');}, 1500);
+    });
+  }
+});
+
+function handleValidate(card){
+  const termEl = card.querySelector('.term-input');
+  const fileEl = card.querySelector('.file-input');
+  const shellInput = termEl.value;
+  const fileInput = fileEl ? fileEl.value : '';
+  const shellPatterns = JSON.parse(card.dataset.check || '[]');
+  const filePatterns = JSON.parse(card.dataset.fileCheck || '[]');
+  const filePath = card.dataset.filePath || '';
+  const hasFile = filePatterns.length > 0;
+  const shellRes = analyzeAnswer(shellInput, shellPatterns);
+  const fileRes = hasFile ? analyzeAnswer(fileInput, filePatterns) : {ok:true, found:[], missing:[]};
+  const ok = shellRes.ok && fileRes.ok;
+  // Bump attempt counter
+  const attempts = (parseInt(card.dataset.attempts || '0', 10)) + 1;
+  card.dataset.attempts = String(attempts);
+  // Push into history if non-empty and not a dupe of the last entry
+  if(shellInput.trim()){
+    const h = JSON.parse(card.dataset.history || '[]');
+    if(h[h.length-1] !== shellInput) h.push(shellInput);
+    card.dataset.history = JSON.stringify(h.slice(-25));
+    card.dataset.historyIdx = '-1';
+  }
+  const fb = card.querySelector('.q-feedback');
+  const sol = card.querySelector('.q-solution');
+  fb.classList.remove('success','error');
+  fb.classList.add('show');
+  const attemptChip = `<span class="attempt-chip">attempt ${attempts}</span>`;
+  if(ok){
+    fb.classList.add('success');
+    const msg = hasFile
+      ? `<b>Correct.</b> Shell commands and the contents of <code>${escHtml(filePath)}</code> both match.${attemptChip}`
+      : `<b>Correct.</b> Your command contains every expected element.${attemptChip}`;
+    fb.innerHTML = `<span class="q-feedback-icon">&check;</span><div>${msg}</div>`;
+    markDone(card.id, true);
+    sol.classList.remove('show');
+  } else {
+    fb.classList.add('error');
+    const anyInput = (shellInput + fileInput).trim();
+    let body;
+    if(!anyInput){
+      body = `<b>Empty answer.</b>${attemptChip} The reference solution is now expanded below.`;
+    } else {
+      let heading;
+      if(hasFile && !shellRes.ok && !fileRes.ok){
+        heading = `<b>Not quite.</b>${attemptChip} Both your shell commands and <code>${escHtml(filePath)}</code> are missing pieces.`;
+      } else if(hasFile && !shellRes.ok){
+        heading = `<b>Almost there.</b>${attemptChip} File contents look good — your shell is missing pieces.`;
+      } else if(hasFile && !fileRes.ok){
+        heading = `<b>Almost there.</b>${attemptChip} Shell is fine — <code>${escHtml(filePath)}</code> is missing pieces.`;
+      } else {
+        heading = `<b>Not quite.</b>${attemptChip} Your shell answer is missing pieces.`;
+      }
+      let chips = '';
+      if(!shellRes.ok && shellRes.missing.length){
+        chips += `<div class="tokens-wrap"><div class="tokens-heading">Shell — missing</div><div class="token-list">${renderTokens(shellRes.missing, 'missing')}</div>`;
+        if(shellRes.found.length){
+          chips += `<div class="tokens-heading found">Shell — found</div><div class="token-list">${renderTokens(shellRes.found, 'found')}</div>`;
+        }
+        chips += `</div>`;
+      }
+      if(hasFile && !fileRes.ok && fileRes.missing.length){
+        chips += `<div class="tokens-wrap"><div class="tokens-heading">File — missing</div><div class="token-list">${renderTokens(fileRes.missing, 'missing')}</div>`;
+        if(fileRes.found.length){
+          chips += `<div class="tokens-heading found">File — found</div><div class="token-list">${renderTokens(fileRes.found, 'found')}</div>`;
+        }
+        chips += `</div>`;
+      }
+      body = heading + chips;
+    }
+    fb.innerHTML = `<span class="q-feedback-icon">&times;</span><div>${body}</div>`;
+    sol.classList.add('show');
+  }
+}
+
+document.addEventListener('click', e=>{
+  const btn = e.target.closest('.btn-validate');
+  if(btn){ handleValidate(btn.closest('.question')); }
+  const show = e.target.closest('.btn-show');
+  if(show){
+    const sol = show.closest('.question').querySelector('.q-solution');
+    sol.classList.toggle('show');
+    show.textContent = sol.classList.contains('show') ? 'Hide solution' : 'Show solution';
+  }
+  const skip = e.target.closest('.btn-skip');
+  if(skip){
+    const card = skip.closest('.question');
+    markDone(card.id, true);
+    const fb = card.querySelector('.q-feedback');
+    fb.classList.remove('error');
+    fb.classList.add('show','success');
+    fb.innerHTML = `<span class="q-feedback-icon">&check;</span><div>Marked as done.</div>`;
+  }
+});
+
+document.addEventListener('keydown', e=>{
+  if(e.target.classList.contains('term-input')){
+    if(e.key === 'Enter' && !e.shiftKey){
+      e.preventDefault();
+      handleValidate(e.target.closest('.question'));
+    }
+  }
+});
+
+// ====== SHELL TERMINAL: history + auto-grow + draft ======
+document.querySelectorAll('.term-input').forEach(ta=>{
+  const card = ta.closest('.question');
+  const qid = card.id;
+  const grow = ()=>{ ta.style.height='auto'; ta.style.height = Math.min(ta.scrollHeight, 200) + 'px'; };
+  ta.addEventListener('input', ()=>{
+    grow();
+    localStorage.setItem('rhcsa-draft-' + qid + '-term', ta.value);
+  });
+  // Restore draft
+  const draft = localStorage.getItem('rhcsa-draft-' + qid + '-term');
+  if(draft){ ta.value = draft; grow(); }
+  // Command history: up/down when on first/last line
+  ta.addEventListener('keydown', e=>{
+    if(e.key !== 'ArrowUp' && e.key !== 'ArrowDown') return;
+    const history = JSON.parse(card.dataset.history || '[]');
+    if(!history.length) return;
+    const val = ta.value;
+    const pos = ta.selectionStart;
+    const beforeCursor = val.slice(0, pos);
+    const afterCursor = val.slice(pos);
+    const atFirstLine = !beforeCursor.includes('\n');
+    const atLastLine = !afterCursor.includes('\n');
+    let idx = parseInt(card.dataset.historyIdx || '-1', 10);
+    if(e.key === 'ArrowUp' && atFirstLine){
+      e.preventDefault();
+      if(idx === -1) idx = history.length;
+      idx = Math.max(0, idx - 1);
+      ta.value = history[idx];
+      card.dataset.historyIdx = String(idx);
+      grow();
+      ta.selectionStart = ta.selectionEnd = ta.value.length;
+    } else if(e.key === 'ArrowDown' && atLastLine && idx !== -1){
+      e.preventDefault();
+      idx++;
+      if(idx >= history.length){
+        ta.value = '';
+        card.dataset.historyIdx = '-1';
+      } else {
+        ta.value = history[idx];
+        card.dataset.historyIdx = String(idx);
+      }
+      grow();
+      ta.selectionStart = ta.selectionEnd = ta.value.length;
+    }
+  });
+});
+
+// ====== FILE EDITOR: line numbers + tab-indent + draft ======
+function updateLineNumbers(ta){
+  const gutter = ta.previousElementSibling;
+  if(!gutter || !gutter.classList.contains('file-linenumbers')) return;
+  const n = (ta.value.match(/\n/g) || []).length + 1;
+  let out = '';
+  for(let i=1;i<=n;i++) out += i + (i<n ? '\n' : '');
+  gutter.textContent = out;
+}
+document.querySelectorAll('.file-input').forEach(ta=>{
+  const card = ta.closest('.question');
+  const qid = card.id;
+  const grow = ()=>{ ta.style.height='auto'; ta.style.height = Math.min(Math.max(100, ta.scrollHeight), 480) + 'px'; };
+  ta.addEventListener('input', ()=>{
+    grow();
+    updateLineNumbers(ta);
+    localStorage.setItem('rhcsa-draft-' + qid + '-file', ta.value);
+  });
+  // Restore draft
+  const draft = localStorage.getItem('rhcsa-draft-' + qid + '-file');
+  if(draft){ ta.value = draft; }
+  grow();
+  updateLineNumbers(ta);
+  // Sync gutter scroll to textarea
+  ta.addEventListener('scroll', ()=>{
+    const gutter = ta.previousElementSibling;
+    if(gutter) gutter.scrollTop = ta.scrollTop;
+  });
+  // Tab-to-indent, Shift-Tab dedent
+  ta.addEventListener('keydown', e=>{
+    if(e.key === 'Tab'){
+      e.preventDefault();
+      const start = ta.selectionStart;
+      const end = ta.selectionEnd;
+      const indent = '  ';
+      if(e.shiftKey){
+        // Dedent: remove up to two leading spaces from every selected line
+        const before = ta.value.slice(0, start);
+        const lineStart = before.lastIndexOf('\n') + 1;
+        const selection = ta.value.slice(lineStart, end);
+        const dedented = selection.replace(/^  /gm, '');
+        ta.value = ta.value.slice(0, lineStart) + dedented + ta.value.slice(end);
+        const shrink = selection.length - dedented.length;
+        ta.selectionStart = Math.max(lineStart, start - Math.min(2, start - lineStart));
+        ta.selectionEnd = end - shrink;
+      } else if(start !== end){
+        // Indent every line in the selection
+        const before = ta.value.slice(0, start);
+        const lineStart = before.lastIndexOf('\n') + 1;
+        const selection = ta.value.slice(lineStart, end);
+        const indented = selection.replace(/^/gm, indent);
+        const grown = indented.length - selection.length;
+        ta.value = ta.value.slice(0, lineStart) + indented + ta.value.slice(end);
+        ta.selectionStart = start + indent.length;
+        ta.selectionEnd = end + grown;
+      } else {
+        ta.value = ta.value.slice(0, start) + indent + ta.value.slice(end);
+        ta.selectionStart = ta.selectionEnd = start + indent.length;
+      }
+      ta.dispatchEvent(new Event('input'));
+    }
+  });
+});
+// Ctrl-Enter inside the file editor validates
+document.addEventListener('keydown', e=>{
+  if(e.target.classList.contains('file-input')){
+    if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+      e.preventDefault();
+      handleValidate(e.target.closest('.question'));
+    }
+  }
+});
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', e=>{
+  const term = e.target.value.toLowerCase().trim();
+  document.querySelectorAll('.question').forEach(q=>{
+    const match = !term || q.dataset.search.includes(term);
+    q.classList.toggle('hidden', !match);
+  });
+  document.querySelectorAll('.cat-header').forEach(ch=>{
+    let next = ch.nextElementSibling;
+    let any = false;
+    while(next && !next.classList.contains('cat-header')){
+      if(next.classList.contains('question') && !next.classList.contains('hidden')){ any=true; break; }
+      next = next.nextElementSibling;
+    }
+    ch.classList.toggle('hidden', !any && !!term);
+  });
+});
+
+const themeBtn = document.getElementById('themeBtn');
+const iconLight = document.getElementById('iconLight');
+const iconDark = document.getElementById('iconDark');
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  iconLight.style.display = t==='dark' ? 'none' : '';
+  iconDark.style.display = t==='dark' ? '' : 'none';
+  localStorage.setItem('rhcsa-theme', t);
+}
+applyTheme(localStorage.getItem('rhcsa-theme') || (matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'));
+themeBtn.addEventListener('click', ()=>{
+  const cur = document.documentElement.getAttribute('data-theme');
+  applyTheme(cur==='dark'?'light':'dark');
+});
+
+function loadProgress(){
+  try{ return JSON.parse(localStorage.getItem('rhcsa-progress-v2')||'{}'); }catch{ return {}; }
+}
+function saveProgress(p){ localStorage.setItem('rhcsa-progress-v2', JSON.stringify(p)); }
+function markDone(id, done){
+  const p = loadProgress();
+  if(done) p[id] = true; else delete p[id];
+  saveProgress(p);
+  refreshProgress();
+}
+function refreshProgress(){
+  const p = loadProgress();
+  let done = 0;
+  document.querySelectorAll('.q-check').forEach(c=>{
+    const id = c.dataset.id;
+    if(p[id]){
+      c.classList.add('checked'); done++;
+      c.closest('.question').classList.add('done');
+    } else {
+      c.classList.remove('checked');
+      c.closest('.question').classList.remove('done');
+    }
+  });
+  document.querySelectorAll('.nav-link').forEach(a=>{
+    a.dataset.done = !!p[a.dataset.qid];
+  });
+  document.getElementById('progDone').textContent = done;
+  // Per-category progress
+  DATA.forEach(cat => {
+    const doneCount = cat.questions.filter(q => p[q.qid]).length;
+    const total = cat.questions.length;
+    const pct = total ? Math.round(doneCount/total*100) : 0;
+    const bar = document.querySelector(`.nav-cat-progress-bar[data-cat="${slug(cat.cat)}"]`);
+    if(bar) bar.style.width = pct + '%';
+    // Update count pill
+    const catId = 'cat-' + slug(cat.cat);
+    const catHeader = document.getElementById(catId);
+    if(catHeader){
+      const countEl = catHeader.nextElementSibling ? null : null; // noop; count is in nav
+    }
+    // Find nav count pill for this category
+    const navCats = document.querySelectorAll('.nav-cat .count');
+    navCats.forEach(el => {
+      const parent = el.closest('.nav-section');
+      if(!parent) return;
+      const bar2 = parent.querySelector(`.nav-cat-progress-bar[data-cat="${slug(cat.cat)}"]`);
+      if(bar2){
+        el.textContent = doneCount > 0 ? `${doneCount}/${total}` : total;
+        el.classList.toggle('done', doneCount === total && total > 0);
+      }
+    });
+  });
+}
+document.querySelectorAll('.q-check').forEach(c=>{
+  c.addEventListener('click', e=>{
+    e.stopPropagation();
+    const id = c.dataset.id;
+    const p = loadProgress();
+    markDone(id, !p[id]);
+  });
+});
+refreshProgress();
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(confirm('Reset all your progress?')){
+    localStorage.removeItem('rhcsa-progress-v2');
+    refreshProgress();
+    document.querySelectorAll('.term-input').forEach(ta=> ta.value='');
+    document.querySelectorAll('.file-input').forEach(ta=>{ ta.value=''; updateLineNumbers(ta); });
+    document.querySelectorAll('.q-feedback').forEach(f=> f.classList.remove('show','success','error'));
+    document.querySelectorAll('.q-solution').forEach(s=> s.classList.remove('show'));
+    document.querySelectorAll('.question').forEach(q=>{ q.dataset.attempts='0'; q.dataset.history='[]'; q.dataset.historyIdx='-1'; });
+    // Clear per-question drafts
+    Object.keys(localStorage).filter(k=>k.startsWith('rhcsa-draft-')).forEach(k=>localStorage.removeItem(k));
+  }
+});
+
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{
+    if(en.isIntersecting){
+      const id = en.target.id;
+      document.querySelectorAll('.nav-link').forEach(a=>{
+        a.classList.toggle('active', a.dataset.qid===id);
+      });
+    }
+  });
+}, {rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.question').forEach(q=> observer.observe(q));
+
+const sidebar = document.getElementById('sidebar');
+const scrim = document.getElementById('scrim');
+document.getElementById('menuBtn').addEventListener('click', ()=>{
+  sidebar.classList.add('open');
+  scrim.classList.add('active');
+});
+scrim.addEventListener('click', ()=>{
+  sidebar.classList.remove('open');
+  scrim.classList.remove('active');
+});
+document.querySelectorAll('.nav-link').forEach(a=>{
+  a.addEventListener('click', ()=>{
+    if(window.innerWidth<=960){
+      sidebar.classList.remove('open');
+      scrim.classList.remove('active');
+    }
+  });
+});
+
+// ============ DESKTOP SIDEBAR PIN / COLLAPSE ============
+const app = document.querySelector('.app');
+const pinBtn = document.getElementById('pinBtn');
+function applyPinState(pinned){
+  app.classList.toggle('sidebar-collapsed', !pinned);
+  pinBtn.setAttribute('aria-pressed', pinned ? 'true' : 'false');
+  pinBtn.setAttribute('aria-label', pinned ? 'Collapse sidebar' : 'Expand sidebar');
+  localStorage.setItem('rhcsa-sidebar-pinned', pinned ? '1' : '0');
+}
+// Default: pinned open
+const savedPinState = localStorage.getItem('rhcsa-sidebar-pinned');
+applyPinState(savedPinState === null ? true : savedPinState === '1');
+pinBtn.addEventListener('click', ()=>{
+  const cur = pinBtn.getAttribute('aria-pressed') === 'true';
+  applyPinState(!cur);
+});
+
+// ============ KEYBOARD SHORTCUTS ============
+// Avoid hijacking when user is typing in an input
+function isTyping(el){
+  return el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.isContentEditable);
+}
+document.addEventListener('keydown', e=>{
+  // Ignore if user is typing, unless it's Escape
+  if(e.key === 'Escape'){
+    const active = document.activeElement;
+    if(active && isTyping(active)) active.blur();
+    return;
+  }
+  if(isTyping(e.target)) return;
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+
+  // "/" focuses search
+  if(e.key === '/'){
+    e.preventDefault();
+    const s = document.getElementById('searchInput');
+    s.focus();
+    s.select();
+    return;
+  }
+  // "[" toggles desktop sidebar
+  if(e.key === '['){
+    if(window.innerWidth > 960){
+      e.preventDefault();
+      pinBtn.click();
+    }
+    return;
+  }
+  // "j" next question, "k" previous question
+  if(e.key === 'j' || e.key === 'k'){
+    e.preventDefault();
+    const cards = Array.from(document.querySelectorAll('.question:not(.hidden)'));
+    if(!cards.length) return;
+    const scrollY = window.scrollY + 120;
+    let idx = cards.findIndex(c => c.offsetTop + c.offsetHeight > scrollY);
+    if(idx < 0) idx = cards.length - 1;
+    const next = e.key === 'j' ? Math.min(idx + 1, cards.length - 1) : Math.max(idx - 1, 0);
+    // If j and we're not yet past the current card's top, go to current instead of next
+    if(e.key === 'j' && cards[idx] && cards[idx].offsetTop > scrollY - 40){
+      cards[idx].scrollIntoView({behavior:'smooth', block:'start'});
+    } else {
+      cards[next].scrollIntoView({behavior:'smooth', block:'start'});
+    }
+    return;
+  }
+  // "?" shows shortcuts overlay
+  if(e.key === '?' && e.shiftKey){
+    e.preventDefault();
+    showShortcuts();
+    return;
+  }
+});
+
+// ============ SHORTCUTS OVERLAY ============
+function showShortcuts(){
+  let o = document.getElementById('shortcutsOverlay');
+  if(o){ o.remove(); return; }
+  o = document.createElement('div');
+  o.id = 'shortcutsOverlay';
+  o.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1000;display:grid;place-items:center;backdrop-filter:blur(4px);animation:fadeIn .15s';
+  o.innerHTML = `
+    <div style="background:var(--bg-elev);border:1px solid var(--border);border-radius:12px;padding:28px 32px;max-width:440px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+      <h3 style="font-family:'Source Serif 4',Georgia,serif;font-size:22px;margin-bottom:18px;color:var(--text)">Keyboard shortcuts</h3>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:13.5px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Focus search</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">/</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Next task</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">j</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Previous task</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">k</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Toggle sidebar</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">[</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Validate answer</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">Enter</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Validate from file editor</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">Ctrl+Enter</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Unfocus input</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">Esc</kbd></div>
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="color:var(--text-muted)">Show this help</span><kbd style="font-family:'JetBrains Mono',monospace;background:var(--surface);padding:3px 8px;border-radius:4px;border:1px solid var(--border);font-size:12px">?</kbd></div>
+      </div>
+      <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);font-size:12px;color:var(--text-faint);text-align:center">Click anywhere to close</div>
+    </div>`;
+  document.body.appendChild(o);
+  o.addEventListener('click', ()=> o.remove());
+}
+</script>
+</body>
+</html>
